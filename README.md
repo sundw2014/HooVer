@@ -1,6 +1,6 @@
 # HooVer: a statistical model checking tool with optimistic optimization
 
-HooVer uses optimistic optimization to solve statistical model checking problems for MDPs.
+HooVer uses optimistic optimization to solve statistical model checking problems for MDPs. Please refer to the [technical report](http://mitras.ece.illinois.edu/research/2019/oosmc-full.pdf) for more details.
 
 ```
 @TECHREPORT{SMCOO:2020,
