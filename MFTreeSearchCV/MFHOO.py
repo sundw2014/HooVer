@@ -16,7 +16,7 @@ from utils.general_utils import map_to_cube  # mapping everything to [0,1]^d cub
 # from examples.synthetic_functions import *
 from multiprocessing import Process
 # import brewer2mpl
-import pandas as pd
+# import pandas as pd
 
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
