@@ -28,3 +28,6 @@ For example, to check the Slplatoon3 model with MFHOO, run the following command
 ```
 python example.py --model Slplatoon3 --budget 1.0 --numRuns 10
 ```
+
+### Corresponding PRISM models
+For every benchmark models in ```models/```, we provide an equivalent PRISM model in ```PRISM/```. The models are discretized and re-scaled using the mechanism described in the paper. These models have been tested with model checkers including [PRSIM](http://www.prismmodelchecker.org/), [Storm](http://www.stormchecker.org/), and [PlasmaLab](http://plasma-lab.gforge.inria.fr/plasma_lab_doc/1.4.4/html/index.html).
