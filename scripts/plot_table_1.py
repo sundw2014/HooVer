@@ -16,7 +16,7 @@ if __name__ == '__main__':
     for exp_id in range(1,10):
         outputs.append([])
         num_nodes.append([])
-        for bs in bss[::-1]:
+        for bs in bss:
             filename = 'data/HooVer_%s_budget%d_bs%d_exp%d.pklz'%(model, budget, bs, exp_id)
             outputs[-1].append(loadpklz('../'+filename))
             num_nodes[-1].append(budget/bs)
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     results_ho = []
     for exp_id in range(1, 10):
-        results_ho.append(loadpklz('../data/HooVer_%s_bs_exp%d.pklz'%(model, exp_id))['results'])
+        results_ho.append(loadpklz('../data/HooVer_%s_bs_exp%d.pklz'%(model, exp_id))['results'][::-1])
 
     results_ho = np.array(results_ho)
 
