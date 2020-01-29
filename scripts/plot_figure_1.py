@@ -23,8 +23,8 @@ right = 0.98   # the right side of the subplots of the figure
 bottom = 0.17  # the bottom of the subplots of the figure
 top = 0.98     # the top of the subplots of the figure
 
-#models = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
-models = ['Merging']
+models = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
+# models = ['Merging']
 
 for model in models:
     results_pl = []
@@ -32,11 +32,10 @@ for model in models:
     results_ho = []
     num_queries_ho = []
     for exp_id in range(1, 10):
-        # results_pl.append(loadpklz('../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))['results'])
-        # num_queries_pl.append(loadpklz('../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))['num_queries'])
-        num_queries_pl.append(loadpklz('/home/daweis2/SMC_MDP/CommonCodesforPaper/MultiFidelity_CAV/examples/plasmalab_output/Merging_port%d_results_vs_num_queries.pklz'%(exp_id+9100-1))['num_queries'])
-        results_pl.append(loadpklz('/home/daweis2/SMC_MDP/CommonCodesforPaper/MultiFidelity_CAV/examples/plasmalab_output/Merging_port%d_results_vs_num_queries.pklz'%(exp_id+9100-1))['results'])
-
+        results_pl.append(loadpklz('../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))['results'])
+        num_queries_pl.append(loadpklz('../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))['num_queries'])
+        # num_queries_pl.append(loadpklz('/home/daweis2/SMC_MDP/CommonCodesforPaper/MultiFidelity_CAV/examples/plasmalab_output/Merging_port%d_results_vs_num_queries.pklz'%(exp_id+9100-1))['num_queries'])
+        # results_pl.append(loadpklz('/home/daweis2/SMC_MDP/CommonCodesforPaper/MultiFidelity_CAV/examples/plasmalab_output/Merging_port%d_results_vs_num_queries.pklz'%(exp_id+9100-1))['results'])
         results_ho.append(loadpklz('../data/HooVer_%s_exp%d.pklz'%(model, exp_id))['results'])
         num_queries_ho.append(loadpklz('../data/HooVer_%s_exp%d.pklz'%(model, exp_id))['num_queries'])
 
