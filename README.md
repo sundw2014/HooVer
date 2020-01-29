@@ -21,16 +21,24 @@ pip install -r requirements.txt
 
 ### Usage
 ```
-python example.py --model [Slplatoon2/Slplatoon3/Mlplatoon] --budget [time budget for simulator] --numRuns [number of runs] [--useHOO]
+python example.py --model [Slplatoon3/Mlplatoon/Merging/DetectingPedestrian] --budget [budget for simulator] --nRuns [number of runs] --rho_max [the rho_max parameter] --sigma [the sigma parameter for UCB] --nHOOs [number of HOO instances to use] --batch_size [batch size] --filename [path to save the results]
 ```
 
-For example, to check the Slplatoon3 model with MFHOO, run the following command:
+For example, to check the Mlplatoon model, run the following command:
 ```
-python example.py --model Slplatoon3 --budget 1.0 --numRuns 10
+python example.py --model Mlplatoon --budget 8000000 --numRuns 1 --sigma 1e-5
 ```
 
-### Corresponding PRISM models
-For every benchmark models in ```models/```, we provide an equivalent PRISM model in ```PRISM/```. The models are discretized and re-scaled using the mechanism described in the paper. These models have been tested with model checkers including [PRSIM](http://www.prismmodelchecker.org/), [Storm](http://www.stormchecker.org/), and [PlasmaLab](http://plasma-lab.gforge.inria.fr/plasma_lab_doc/1.4.4/html/index.html).
+### Verify your own model
+The users can create their own model following the interface used in ```models/Slplatoon3.py```. Data and functions to be implemented include ```T```, ```state_start```, ```state_range```, ```is_unsafe```, and ```step_forward```.
+
+```T``` is the time horizon of the model.
+
+```state_start``` and ```state_range``` describe a hyper-rectangle which is the initial state domain.
+
+```is_usafe``` is used to determine whether a state is unsafe.
+
+```step_forward``` is a single-step transition function of the model.
 
 ### Acknowledgements
 
