@@ -12,7 +12,7 @@ T = 11
 dim = 4
 exp_id = int(sys.argv[1])
 port_base = 9100
-plasmalab_root = '/home/daweis2/plasmalab-1.4.4/'
+plasmalab_root = '/root/plasmalab-1.4.4/'
 
 if __name__ == '__main__':
     budgets = np.logspace(np.log(0.85 * 1e5)/np.log(2), np.log(8e5)/np.log(2), num=6, base=2).astype('int')
@@ -59,7 +59,7 @@ if __name__ == '__main__':
             # The os.setsid() is passed in the argument preexec_fn so
             # it's run after the fork() and before  exec() to run the shell.
             simulator = subprocess.Popen('cd ../; python simulator.py --model %s --port %d --seed %d'%(model, port, seed), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
-            output = subprocess.check_output(plasmalab_root+'/plasmacli.sh launch -m '+tmp_model_name+':PythonSimulatorBridge -r '+tmp_spec_name+':bltl -a montecarlo -A "Total samples"=300', universal_newlines=True, shell=True)
+            output = subprocess.check_output(plasmalab_root+'/plasmacli.sh launch -m '+tmp_model_name+':PythonSimulatorBridge -r '+tmp_spec_name+':bltl -a montecarlo -A "Total samples"=30000', universal_newlines=True, shell=True)
             os.killpg(os.getpgid(simulator.pid), signal.SIGTERM)  # Send the signal to all the process groups
             tmp_results.append(float(output.split('\n')[-3].split('|')[4]))
         results.append(np.max(tmp_results))

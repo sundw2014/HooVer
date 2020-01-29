@@ -26,7 +26,7 @@ top = 0.98     # the top of the subplots of the figure
 models = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
 # models = ['Merging']
 
-models = [models[int(sys.argv[1])], ]
+models = [models[int(sys.argv[1])-1], ]
 
 for model in models:
     results_pl = []
