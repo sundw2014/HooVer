@@ -14,7 +14,7 @@ if __name__ == '__main__':
     rhomaxs = [0.95, 0.9, 0.8, 0.6, 0.4, 0.16, 0.01]
     for exp_id in range(1,10):
         outputs.append([])
-        for rhomax in rhomaxs[::-1]:
+        for rhomax in rhomaxs:
             filename = 'data/HooVer_%s_budget%d_rhomax%f_exp%d.pklz'%(model, budget, rhomax, exp_id)
             outputs[-1].append(loadpklz('../'+filename))
 
