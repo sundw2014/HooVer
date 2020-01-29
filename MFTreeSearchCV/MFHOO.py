@@ -16,7 +16,6 @@ from utils.general_utils import map_to_cube  # mapping everything to [0,1]^d cub
 # from examples.synthetic_functions import *
 from multiprocessing import Process
 # import brewer2mpl
-# import pandas as pd
 
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
@@ -512,15 +511,16 @@ class MFHOO(object):
 
     def run(self):
         self.num_query = 0
-        # import pdb; pdb.set_trace()
-        while self.cost <= self.budget:
+        #import pdb; pdb.set_trace()
+        while self.t <= self.budget:
             # old_cost = self.cost
             # _t1 = time.time()
-            self.num_query = self.num_query + 1
+            self.num_query = self.num_query + 2
             self.take_HOO_step()
             # _t2=time.time()
             # print('%.5f, %.5f, %.1f'%(self.cost-old_cost, _t2-_t1, (_t2-_t1)/(self.cost-old_cost)))
-        print('number of queries: ' + str(self.num_query))
+        #print('number of queries: ' + str(self.num_query))
+        print('number of queries: ' + str(self.t))
 
     # -----------------------------------------------------------------------------
 
@@ -540,13 +540,14 @@ class MFPOO(object):
 
     # -----------------------------------------------------------------------------
 
-    def __init__(self, mfobject, nu_max, rho_max, total_budget, sigma, C, mult, tol=1e-3, Randomize=False, Auto=True,
+    def __init__(self, mfobject, nu_max, rho_max, nHOO, sigma, C, mult, tol=1e-3, Randomize=False, Auto=True,
                  unit_cost=1.0, CAPITAL='Time', debug='True', useHOO=False, direct_budget=0.2):
         self.number_of_queries = []
         self.mfobject = mfobject
         self.nu_max = nu_max
         self.rho_max = rho_max
-        self.total_budget = total_budget
+        self.nHOO = nHOO
+        self.budget = direct_budget
         self.C = 1* C
         self.t = 0
         self.sigma = sigma
@@ -603,33 +604,10 @@ class MFPOO(object):
             c1 = self.mfobject.eval_fidel_cost_single_point_normalised(z1)
             c2 = self.mfobject.eval_fidel_cost_single_point_normalised(z2)
 
-            if CAPITAL == 'Actual':
-                self.total_budget = self.total_budget - c1 - c2
-            elif CAPITAL == 'Time':
-                self.total_budget = self.total_budget - (t2 - t1)
-
-            # if self.CAPITAL == 'Time':
-            #     self.total_budget = self.total_budget - (t2 - t1)
-
-            if self.debug:
-                print('Budget Remaining: ' + str(self.total_budget))
-
         if self.CAPITAL == 'Time':
             self.unit_cost = unit_cost
         else:
             self.unit_cost = self.mfobject.eval_fidel_cost_single_point_normalised(1.0)
-        n = max(self.total_budget / self.unit_cost, 1)
-        Dm = int(np.log(2.0) / np.log(1 / self.rho_max))
-        nHOO = int(mult * Dm * np.log(n / np.log(n + 1)))
-        self.nHOO = max(1, int(min(max(1, nHOO), n / 2 + 1)))
-        self.budget = (self.total_budget - self.nHOO * self.unit_cost) / float(self.nHOO)
-        # self.budget = 0.4
-        self.budget = direct_budget
-        # def getv(n):
-        #     nHOO = int(mult * Dm * np.log(n / np.log(n + 1)))
-        #     nHOO = max(1, int(min(max(1, nHOO), n / 2 + 1)))
-        #     return nHOO, n/nHOO
-        # from IPython import embed; embed()
         if self.debug:
             print('Number of MFHOO Instances: ' + str(self.nHOO))
             print('Budget per MFHOO Instance:' + str(self.budget))
@@ -645,7 +623,18 @@ class MFPOO(object):
                        Randomize=False, Auto=True if not self.useHOO else False, value_dict=self.value_dict, CAPITAL=self.CAPITAL, debug=self.debug, comp_value_dict = self. comp_value_dict, useHOO=self.useHOO)
             print('Running SOO number: ' + str(i + 1) + ' rho: ' + str(rho) + ' nu: ' + str(nu))
             MH.run()
-            self.number_of_queries = self.number_of_queries + [MH.num_query]
+
+            _a, _b = MH.get_point()
+            _node = MH.comp_value_dict[_b]
+            _ncell = self.mfobject.get_unnormalised_cell(_node.cell)
+
+            print('depth: %d, ncell:'%(_node.height)+str(_ncell))
+            # node_fidelity[i] = node.fidelity
+            # mean_values[i] = node.m_value
+            i = i + 1
+
+            #self.number_of_queries = self.number_of_queries + [MH.num_query]
+            self.number_of_queries = self.number_of_queries + [MH.t]
             print('Done!')
             self.cost = self.cost + MH.cost
             if MH.cflag:

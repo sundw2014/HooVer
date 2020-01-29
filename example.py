@@ -5,11 +5,12 @@ import numpy as np
 import time
 import importlib
 import hoover
+import MFMC
+from utils.general_utils import loadpklz, savepklz
 
 if __name__ == '__main__':
-    model_names = ['Slplatoon2', 'Slplatoon3', 'Mlplatoon']
-    true_max_probs = [0.8799573347, 0.8726806826, 0.5918981603]
-    true_max_probs = dict(zip(model_names, true_max_probs))
+    model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
+    # true_max_probs = dict(zip(model_names, true_max_probs))
 
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--model', metavar='MODEL',
@@ -18,55 +19,60 @@ if __name__ == '__main__':
                         help='models available: ' +
                             ' | '.join(model_names) +
                             ' (default: Slplatoon3)')
-    parser.add_argument('--useHOO', action='store_true', help='Use HOO')
-    parser.add_argument('--numRuns', type=int, help='number of runs')
-    parser.add_argument('--budget', type=float, help='time budget for simulator')
+    parser.add_argument('--nRuns', type=int, default=1, help='number of runs')
+    parser.add_argument('--budget', type=int, default=int(1e6), help='budget for number of simulations')
+    parser.add_argument('--rho_max', type=float, default=0.6, help='time budget for simulator')
+    parser.add_argument('--sigma', type=float, help='Sigma parameter for UCB')
+    parser.add_argument('--nHOOs', type=int, default=4, help='number of HOO instances to use')
+    parser.add_argument('--batch_size', type=int, default=100, help='batch size')
+    parser.add_argument('--filename', type=str, default='./output.pklz', help='path to save the results')
     args = parser.parse_args()
 
-    model = importlib.import_module('models.'+args.model)
+    simulator = importlib.import_module('models.'+args.model)
+    MFMC.set_simulator(simulator)
 
-    num_exp = args.numRuns
-    direct_budget = args.budget
-    useHOO = args.useHOO
+    num_exp = args.nRuns
 
-    np.random.seed(1024)
+    budget_for_each_HOO = (args.budget - 40000) / args.nHOOs / args.batch_size
 
-    run_times = []
+    running_times = []
     memory_usages = []
-    num_queries = []
     depths = []
-    max_probs = []
+    optimal_xs = []
+    optimal_values = []
 
     for _ in range(num_exp):
         start_time = time.time()
-        MCh_object = model.get_mch_as_mf()
-        mf_MCh_object = model.MFMarkovChain.mf_markov_chain(MCh_object)
+        # import pdb; pdb.set_trace()
+        MCh_object, MCh = MFMC.get_mch_as_mf(args.batch_size)
+        mf_MCh_object = MFMC.MFMarkovChain.mf_markov_chain(MCh_object)
 
-        noise_var = 5
-        sigma = np.sqrt(noise_var)
-        nu = 1.0
-        rho = 0.95
-        C = 0.1
-        t0 = mf_MCh_object.opt_fidel_cost
+        if args.sigma is None:
+            sigma = np.sqrt(0.5*0.5/args.batch_size)
+        else:
+            sigma = args.sigma
+
+        rho_max = args.rho_max
 
         try:
-            Number_of_Queries, max_prob, depth, memory_usage = hoover.estimate_max_probability(mf_MCh_object, nu, rho, sigma, C, t0, direct_budget=direct_budget, useHOO=useHOO)
+            optimal_x, optimal_value, depth, memory_usage = hoover.estimate_max_probability(mf_MCh_object, args.nHOOs, rho_max, sigma, budget_for_each_HOO)
         except AttributeError as e:
             print(e)
             continue
-        end_time = time.time()
-        run_time = end_time - start_time
 
-        run_times.append(run_time)
+        end_time = time.time()
+        running_time = end_time - start_time
+
+        running_times.append(running_time)
         memory_usages.append(memory_usage/1024.0/1024.0)
-        num_queries.append(Number_of_Queries)
-        max_probs.append(max_prob)
+        optimal_values.append(optimal_value)
+        optimal_xs.append(optimal_x)
         depths.append(depth)
 
-    print('budget: ' + str(direct_budget))
-    print('running time (s): %.2f +/- %.3f'%(np.mean(run_times), np.std(run_times)))
+    print('budget: ' + str(args.budget))
+    print('running time (s): %.2f +/- %.3f'%(np.mean(running_times), np.std(running_times)))
     print('memory usage (MB): %.2f +/- %.3f'%(np.mean(memory_usages), np.std(memory_usages)))
-    print('max probability: %.4f +/- %.5f'%(np.mean(max_probs), np.std(max_probs)))
-    print('true max probability: %.5f'%(true_max_probs[args.model]))
-    print('number of queries: %d +/- %.1f'%(np.mean(num_queries), np.std(num_queries)))
+    print('optimal_values: %.4f +/- %.5f'%(np.mean(optimal_values), np.std(optimal_values)))
+    print('optimal_xs: '+str(optimal_xs))
     print('depth: ' + str(depths))
+    savepklz({'budget':args.budget, 'running_times':running_times, 'memory_usages':memory_usages, 'optimal_values':optimal_values, 'optimal_xs':optimal_xs, 'depths':depths}, args.filename)

@@ -1,24 +1,35 @@
-# Author: Negin
-
 import numpy as np
 import math
+import sys
+sys.path.append('..')
 from utils.general_utils import map_to_cube, map_to_bounds, map_cell_to_bounds, llist_generator
-from numpy.core._multiarray_umath import ndarray
 import time
 
-
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
+simulator = None
+state_start = None
+state_range = None
+index_non_const_dims = None
+T = None
 
-def get_mch_as_mf():
+def set_simulator(module):
+    global simulator, state_start, state_range, index_non_const_dims, T
+    simulator = module
+    state_start = simulator.state_start.astype('float')
+    state_range = simulator.state_range.astype('float')
+    index_non_const_dims = np.where(state_range>0)[0]
+    T = simulator.T
+
+def get_mch_as_mf(batch_size):
     MCh = MarkovChain()
     reward_function = lambda x, z: MCh.run_markov_chain(x, math.ceil(z))
     fidel_cost_function = lambda z: 1
     fidel_dim = 1
-    fidel_bounds = np.array([(20, 50)] * fidel_dim)
+    fidel_bounds = np.array([(1,T)] * fidel_dim)
     return MFMarkovChain(reward_function, MCh.init_set_domain_bounds, MCh.init_set_domain_dim, fidel_cost_function,
-                         fidel_bounds, fidel_dim)
+                         fidel_bounds, fidel_dim, batch_size), MCh
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
@@ -29,130 +40,58 @@ def get_mch():
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
+def get_full_state(_state):
+    state = state_start.copy()
+    state[index_non_const_dims] = _state.reshape(-1)
+    return state
 
 class MarkovChain(object):
     """
-    Markov chain simulation class for example 1.
+    Markov chain simulation class for n car platoon with policy.
     """
     def __init__(self):
 
         """
-        prob_trans = state transition rule in y direction
         time_hor = predefined time horizon for markov chain
-        init_set_domain = specifies the bounds for the set of initial states along x and y directions
         unsafe_rule = rule for specifying unsafe set
         """
-        self.prob_trans = 0.5
-        self.num_cars = 2
-        self.min_dist = 5
-        self.state_space_max_pos = 100
-        # self.time_hor = 20
-        self.init_set_domain_dim = self.num_cars
-        self.vel_prob = 0.9
-        bounds = np.array([(0, 0)] * self.init_set_domain_dim)
-        bounds[0][0] = 0
-        bounds[0][1] = 2
-        bounds[1][0] = 5
-        bounds[1][1] = 8
-        # bounds[1][0] = 1
-        # bounds[1][1] = self.min_dist
-        # for j in range(self.num_cars-2):
-        #     bounds[j+2][0] = bounds[j+1][1] + 1
-        #     bounds[j+2][1] = bounds[j+1][1] + self.min_dist
-        self.init_set_domain_bounds = bounds
-        self.unsafe_rule = 2*self.min_dist
-        self.speeds = np.array([4, 3])
 
+        self.init_set_domain_dim = len(index_non_const_dims)
+        bounds = np.stack([state_start[index_non_const_dims], state_start[index_non_const_dims] + state_range[index_non_const_dims]]).T
+        self.init_set_domain_bounds = bounds
+
+        self.cnt_queries = 0
     # -----------------------------------------------------------------------------
 
     def run_markov_chain(self, init_state, time_hor):
-        state_current_ = [0]*self.num_cars
-        for j in range(self.num_cars):
-            state_current_[j] = init_state[0][j]
-        state_current = state_current_
-        unsafe = self.is_unsafe(state_current)
+
+        self.cnt_queries += 1
+
+        state = get_full_state(init_state).tolist()
+        state += [1, simulator.is_unsafe(state)]
+
+        unsafe = state[-1] > 0
         reward = 0
 
         for step in range(time_hor - 1):
-
-            state_current_ = sorted(state_current_)
-
             if unsafe:
                 break
-            elif not unsafe:
-                for k in range(self.num_cars):
-                    if k == self.num_cars-1:
-                        state_current[k] = state_current_[k] + self.speeds[0]
-                    else:
-                        if (state_current_[k+1]-state_current_[k]) > self.min_dist:
-                            rnd = np.random.random()
-                            if rnd <= self.vel_prob:
-                                state_current[k] = state_current_[k] + self.speeds[0]
-                            else:
-                                state_current[k] = state_current_[k] + self.speeds[1]
-                        else:
-                            rnd = np.random.random()
-                            if rnd <= self.vel_prob:
-                                state_current[k] = state_current_[k] + self.speeds[1]
-                            else:
-                                state_current[k] = state_current_[k] + self.speeds[0]
-                state_current_ = state_current
-                state_current_ = sorted(state_current_)
-                unsafe = self.is_unsafe(state_current_)
-
-        # for step in range(time_hor - 1):
-        #
-        #     state_current_ = sorted(state_current_)
-        #
-        #     if unsafe:
-        #         break
-        #     elif not unsafe:
-        #         for k in range(self.num_cars):
-        #             rnd = np.random.random()
-        #             if rnd <= self.prob_trans:
-        #                 state_current[k] = state_current_[k] + self.speeds[1]
-        #             else:
-        #                 state_current[k] = state_current_[k] + self.speeds[0]
-        #         state_current_ = state_current
-        #         state_current_ = sorted(state_current_)
-        #         unsafe = self.is_unsafe(state_current_)
+            else:
+                state = simulator.step_forward(state)
+                unsafe = state[-1] > 0
 
         if unsafe:
             reward = 1
 
-        # if unsafe:
-        #     reward = 1 + np.random.normal(0, np.sqrt(5), 1)
-        # else:
-        #     reward = 0 + np.random.normal(0, np.sqrt(5), 1)
-
         return reward
-
-    # -----------------------------------------------------------------------------
-
-# -----------------------------------------------------------------------------
-
-    def is_unsafe(self, state):
-        unsafe = False
-
-        for k in range(self.num_cars-1):
-            if abs(state[k] - state[k+1]) > self.unsafe_rule:
-                unsafe = True
-                break
-
-        return unsafe
-
-    # -----------------------------------------------------------------------------
-
-# -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
 
 
 class MFMarkovChain(object):
     """
-        Markov chain simulation class for example 1.
-        """
+        Markov chain simulation class for n-car platoon with policy.
+    """
 
-    def __init__(self, reward_function, domain_bounds, domain_dim, fidel_cost_function, fidel_bounds, fidel_dim):
+    def __init__(self, reward_function, domain_bounds, domain_dim, fidel_cost_function, fidel_bounds, fidel_dim, batch_size):
 
         self.reward_function = reward_function
         self.domain_bounds = domain_bounds
@@ -162,6 +101,7 @@ class MFMarkovChain(object):
         self.fidel_dim = fidel_dim
         self.opt_fidel_cost = self.cost_single(1)
         self.max_iteration = 200
+        self.batch_size = batch_size
         # self.opt_fidel_cost = self.cost_single_average(1)
 
     # -----------------------------------------------------------------------------
@@ -199,8 +139,9 @@ class MFMarkovChain(object):
 
     def eval_at_fidel_single_point_normalised(self, Z, X):
         """ Evaluates X at the given Z at a single point using normalised coordinates. """
-        Z, X = self.get_unnormalised_coords(Z, X)
-        return self.eval_at_fidel_single_point(Z, X)
+        #Z, X = self.get_unnormalised_coords(Z, X)
+        #return self.eval_at_fidel_single_point(Z, X)
+        return self.eval_at_fidel_single_point_normalised_average(Z, X, self.batch_size)
 
     # -----------------------------------------------------------------------------
 
@@ -242,6 +183,7 @@ class MFMarkovChain(object):
         return ret_Z, ret_X
 
     # -----------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
 
     def get_unnormalised_cell(self, X):
         """ Maps points in the cube to the original space. """
@@ -250,7 +192,5 @@ class MFMarkovChain(object):
 
     # -----------------------------------------------------------------------------
 
-    # -----------------------------------------------------------------------------
-
     def mf_markov_chain(MCh_object):
-        return MFMarkovChain(MCh_object.reward_function, MCh_object.domain_bounds, MCh_object.domain_dim, MCh_object.fidel_cost_function, MCh_object.fidel_bounds, MCh_object.fidel_dim)
+        return MFMarkovChain(MCh_object.reward_function, MCh_object.domain_bounds, MCh_object.domain_dim, MCh_object.fidel_cost_function, MCh_object.fidel_bounds, MCh_object.fidel_dim, MCh_object.batch_size)
