@@ -31,3 +31,7 @@ python example.py --model Slplatoon3 --budget 1.0 --numRuns 10
 
 ### Corresponding PRISM models
 For every benchmark models in ```models/```, we provide an equivalent PRISM model in ```PRISM/```. The models are discretized and re-scaled using the mechanism described in the paper. These models have been tested with model checkers including [PRSIM](http://www.prismmodelchecker.org/), [Storm](http://www.stormchecker.org/), and [PlasmaLab](http://plasma-lab.gforge.inria.fr/plasma_lab_doc/1.4.4/html/index.html).
+
+### Acknowledgements
+
+The MFTreeSearchCV code base was developed by Rajat Sen: ( https://github.com/rajatsen91/MFTreeSearchCV ) which in-turn was built on the blackbox optimization code base of Kirthivasan Kandasamy: ( https://github.com/kirthevasank )
