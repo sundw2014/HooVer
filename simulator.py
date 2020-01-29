@@ -9,13 +9,13 @@ import importlib
 import sys
 import argparse
 
-model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
+model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging', 'FakeModel']
 
 parser = argparse.ArgumentParser(description='')
 
 parser.add_argument('--model', metavar='MODEL',
                         default='Slplatoon3',
-                        choices=model_names,
+                        # choices=model_names,
                         help='models available: ' +
                             ' | '.join(model_names) +
                             ' (default: Slplatoon3)')
@@ -27,7 +27,12 @@ args = parser.parse_args()
 
 assert (args.initial_states is None or args.seed is None)
 
-simulator = importlib.import_module('models.'+args.model)
+if 'FakeModel' in args.model:
+    s = float(args.model[10:])
+    simulator = importlib.import_module('models.FakeModel')
+    simulator.s = s
+else:
+    simulator = importlib.import_module('models.'+args.model)
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)

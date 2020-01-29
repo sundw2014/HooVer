@@ -9,13 +9,13 @@ import MFMC
 from utils.general_utils import loadpklz, savepklz
 
 if __name__ == '__main__':
-    model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
+    model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging', 'FakeModel']
     # true_max_probs = dict(zip(model_names, true_max_probs))
 
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--model', metavar='MODEL',
                         default='Slplatoon3',
-                        choices=model_names,
+                        # choices=model_names,
                         help='models available: ' +
                             ' | '.join(model_names) +
                             ' (default: Slplatoon3)')
@@ -28,7 +28,14 @@ if __name__ == '__main__':
     parser.add_argument('--filename', type=str, default='./output.pklz', help='path to save the results')
     args = parser.parse_args()
 
-    simulator = importlib.import_module('models.'+args.model)
+    if 'FakeModel' in args.model:
+        s = float(args.model[10:])
+        simulator = importlib.import_module('models.FakeModel')
+        simulator.s = s
+        print(simulator.s)
+    else:
+        simulator = importlib.import_module('models.'+args.model)
+
     MFMC.set_simulator(simulator)
 
     num_exp = args.nRuns
@@ -66,7 +73,7 @@ if __name__ == '__main__':
         running_times.append(running_time)
         memory_usages.append(memory_usage/1024.0/1024.0)
         optimal_values.append(optimal_value)
-        optimal_xs.append(optimal_x)
+        optimal_xs.append(MFMC.get_full_state(optimal_x))
         depths.append(depth)
 
     print('budget: ' + str(args.budget))
