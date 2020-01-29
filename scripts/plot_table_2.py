@@ -14,8 +14,8 @@ if __name__ == '__main__':
     rhomaxs = [0.95, 0.9, 0.8, 0.6, 0.4, 0.16, 0.01]
     for exp_id in range(1,10):
         outputs.append([])
-        for bs in bss[::-1]:
-            filename = 'data/HooVer_%s_budget%d_bs%d_exp%d.pklz'%(model, budget, bs, exp_id)
+        for rhomax in rhomaxs[::-1]:
+            filename = 'data/HooVer_%s_budget%d_rhomax%f_exp%d.pklz'%(model, budget, rhomax, exp_id)
             outputs[-1].append(loadpklz('../'+filename))
 
     depth = [[o['depths'][0] for o in exp] for exp in outputs]
