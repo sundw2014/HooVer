@@ -3,7 +3,7 @@ data/
 model_[0-9]*
 spec_[0-9]*
 *.class
-*.jar
+#*.jar
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
