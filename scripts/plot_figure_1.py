@@ -50,4 +50,5 @@ for model in models:
     plt.xlabel('#queries (x $10^5$)')
     plt.ylabel('hitting probability')
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top)
-    plt.show()
+    #plt.show()
+    plt.savefig('%s.pdf'%model)
