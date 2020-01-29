@@ -1,3 +1,5 @@
 numpy
 pympler
 llist
+zmq
+msgpack
