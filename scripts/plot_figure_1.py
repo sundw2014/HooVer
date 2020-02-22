@@ -40,7 +40,7 @@ for model in models:
         num_queries_ho.append(loadpklz('../data/HooVer_%s_exp%d.pklz'%(model, exp_id))['num_queries'])
 
     results_pl = np.array(results_pl)
-    num_queries_pl = np.array(num_queries_pl) / 1e5
+    num_queries_pl = np.array(num_queries_pl) * 16 / 1e5
     results_ho = np.array(results_ho)
     num_queries_ho = np.array(num_queries_ho) / 1e5
 
