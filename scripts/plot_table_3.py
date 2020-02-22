@@ -14,8 +14,6 @@ for exp_id in range(1, 10):
     results_pl.append(loadpklz('../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))['results'])
     ss_pl.append(loadpklz('../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))['ss'])
 
-    if exp_id == 5:
-        exp_id = 15
     results_ho.append(loadpklz('../data/HooVer_%s_exp%d.pklz'%(model, exp_id))['results'])
     ss_ho.append(loadpklz('../data/HooVer_%s_exp%d.pklz'%(model, exp_id))['ss'])
 
