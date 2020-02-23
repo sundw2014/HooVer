@@ -21,7 +21,7 @@ brake_acc = 8 # m/s^2
 v_error = 0.
 
 # T = 20
-T = 3
+T = 10
 
 def random_initialization(seed, initial_states=None):
     if initial_states is not None:
@@ -41,6 +41,7 @@ def is_unsafe(state):
         return 0.
 
 def step_forward(_state):
+    # print(_state)
     assert len(_state) == len(state_start) + 2
     state = list(_state[:-2])
     t = _state[-2]
@@ -55,7 +56,7 @@ def step_forward(_state):
 
     # this is an unsafe lidar model
     def lidar_prob(theta, r):
-        s = 1e-7
+        s = 5e-6
         theta_broken = 0.08
         r_max = 10000
         prob = (1 - np.exp(-1.0 * (theta - theta_broken) ** 2 / s))# * ((r - r_max) ** 2 / (r_max ** 2))
@@ -69,6 +70,7 @@ def step_forward(_state):
         prob = 0
 
     if np.random.rand() < prob:
+        # print('detected')
         # detected
         brake_distance = state[1] ** 2 / (2 * brake_acc)
 
