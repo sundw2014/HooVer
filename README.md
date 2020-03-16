@@ -19,7 +19,7 @@ python3 example.py --model Mlplatoon --budget 8000000 --nRuns 1 --sigma 1e-5
 ```
 
 ### Verify your own model
-The users can create their own model and put it into the ```models/``` folder. For example, one can create ```models/MyModel.py``` and run HooVer with ```--model MyModel```. The new model should implement the interface used in ```models/Slplatoon3.py```. Specifically, variables and functions to be implemented include ```T```, ```state_start```, ```state_range```, ```is_unsafe```, and ```step_forward```.
+The users can create their own model and put it into the ```models/``` folder. For example, one can create ```models/MyModel.py``` and run HooVer with ```python3 example.py --model MyModel --budget 100000 --nRuns 1```. The new model should implement the interface used in ```models/Slplatoon3.py```. Specifically, variables and functions to be implemented include ```T```, ```state_start```, ```state_range```, ```is_unsafe```, and ```step_forward```.
 
 ```T``` is the time horizon of the model. For example, ```T = 10```.
 
@@ -33,8 +33,8 @@ the above code defines an intial state space ![\{(x,y)|x \in \[1,2\], y\in\[2,3\
 ```is_usafe``` is used to check whether a state is unsafe. This function should return ```1.``` if the state is unsafe and return ```0.``` otherwise. For example,
 ```python
 def is_unsafe(state):
-    if np.linalg.norm(state) > 1:
-        return 1. # return unsafe if norm of the state is greater than 1.
+    if np.linalg.norm(state) > 4:
+        return 1. # return unsafe if norm of the state is greater than 4.
     return 0. # return safe otherwise.
 ```
 
@@ -45,10 +45,10 @@ def step_forward(state):
     system_state = state[:-2] # extract the state of the system
     t = state[-2] # extract the current time step
     system_state = np.array(system_state)
-    system_state += np.random.randn(len(system_state)) # a normally distributed increment
+    system_state += 1.0 * np.random.randn(len(system_state)) # a normally distributed increment
     system_state = system_state.tolist()
     t += 1 # increase the time step by 1
-    return system_state + [t, is_unsafe(state)] # return the new state
+    return system_state + [t, is_unsafe(system_state)] # return the new state
 ```
 
 ### Acknowledgements
