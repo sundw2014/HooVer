@@ -33,7 +33,7 @@ the above code defines an intial state space ![\{(x,y)|x \in \[1,2\], y\in\[2,3\
 ```is_usafe``` is used to check whether a state is unsafe. This function should return ```1.``` if the state is unsafe and return ```0.``` otherwise. For example,
 ```python
 def is_unsafe(state):
-    if np.array(state).norm() > 1:
+    if np.linalg.norm(state) > 1:
         return 1. # return unsafe if norm of the state is greater than 1.
     return 0. # return safe otherwise.
 ```
