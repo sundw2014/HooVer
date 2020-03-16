@@ -38,7 +38,7 @@ def is_unsafe(state):
     return 0. # return safe otherwise.
 ```
 
-```step_forward``` is a single-step transition function of the model. For example, the following code describe a random walk process
+```step_forward``` is a single-step transition function of the model. For example, the following code models a random walk process
 ```python
 def step_forward(state):
     # The input state variable contains the state of the system, the current time step, and the isunafe flag, i.e. state = system_state + [t, is_unsafe(system_state)]
