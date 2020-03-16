@@ -21,13 +21,35 @@ python3 example.py --model Mlplatoon --budget 8000000 --nRuns 1 --sigma 1e-5
 ### Verify your own model
 The users can create their own model following the interface used in ```models/Slplatoon3.py```. Data and functions to be implemented include ```T```, ```state_start```, ```state_range```, ```is_unsafe```, and ```step_forward```.
 
-```T``` is the time horizon of the model.
+```T``` is the time horizon of the model. For example, ```T = 10```.
 
-```state_start``` and ```state_range``` describe a hyper-rectangle which is the initial state domain.
+```state_start``` and ```state_range``` describe a hyper-rectangle which is the initial state domain. For example,
+```python
+state_start = np.array([1,2])
+state_range = np.array([1,1])
+```
+the above code defines an intial state space ![\{(x,y)|x \in \[1,2\], y\in\[2,3\]\}](https://render.githubusercontent.com/render/math?math=%5C%7B(x%2Cy)%7Cx%20%5Cin%20%5B1%2C2%5D%2C%20y%5Cin%5B2%2C3%5D%5C%7D).
 
-```is_usafe``` is used to determine whether a state is unsafe.
+```is_usafe``` is used to check whether a state is unsafe. This function should return ```1.``` if the state is unsafe and return ```0.``` otherwise. For example,
+```python
+def is_unsafe(state):
+    if np.array(state).norm() > 1:
+        return 1. # return unsafe if norm of the state is greater than 1.
+    return 0. # return safe otherwise.
+```
 
-```step_forward``` is a single-step transition function of the model.
+```step_forward``` is a single-step transition function of the model. For example, the following code describe a random walk process
+```python
+def step_forward(state):
+    # The input state variable contains the state of the system, the current time step, and the isunafe flag, i.e. state = system_state + [t, is_unsafe(system_state)]
+    system_state = state[:-2] # extract the state of the system
+    t = state[-2] # extrac the current time step
+    system_state = np.array(system_state)
+    system_state += np.random.randn(len(system_state)) # random walk
+    system_state = system_state.tolist()
+    t += 1 # increase the time step by 1
+    return system_state + [t, is_unsafe(state)] # return the new state
+```
 
 ### Acknowledgements
 
