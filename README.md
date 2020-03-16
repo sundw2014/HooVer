@@ -43,9 +43,9 @@ def is_unsafe(state):
 def step_forward(state):
     # The input state variable contains the state of the system, the current time step, and the isunafe flag, i.e. state = system_state + [t, is_unsafe(system_state)]
     system_state = state[:-2] # extract the state of the system
-    t = state[-2] # extrac the current time step
+    t = state[-2] # extract the current time step
     system_state = np.array(system_state)
-    system_state += np.random.randn(len(system_state)) # random walk
+    system_state += np.random.randn(len(system_state)) # a normally distributed increment
     system_state = system_state.tolist()
     t += 1 # increase the time step by 1
     return system_state + [t, is_unsafe(state)] # return the new state
