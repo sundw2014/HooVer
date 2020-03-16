@@ -19,7 +19,7 @@ python3 example.py --model Mlplatoon --budget 8000000 --nRuns 1 --sigma 1e-5
 ```
 
 ### Verify your own model
-The users can create their own model following the interface used in ```models/Slplatoon3.py```. Data and functions to be implemented include ```T```, ```state_start```, ```state_range```, ```is_unsafe```, and ```step_forward```.
+The users can create their own model and put it into the ```models/``` folder. For example, one can create ```models/MyModel.py``` and run HooVer with ```--model MyModel```. The new model should implement the interface used in ```models/Slplatoon3.py```. Specifically, variables and functions to be implemented include ```T```, ```state_start```, ```state_range```, ```is_unsafe```, and ```step_forward```.
 
 ```T``` is the time horizon of the model. For example, ```T = 10```.
 
@@ -38,7 +38,7 @@ def is_unsafe(state):
     return 0. # return safe otherwise.
 ```
 
-```step_forward``` is a single-step transition function of the model. For example, the following code models a Brownian motion process
+```step_forward``` is the single-step transition function of the model. For example, the following code models a Brownian motion process
 ```python
 def step_forward(state):
     # The input state variable contains the state of the system, the current time step, and the isunafe flag, i.e. state = system_state + [t, is_unsafe(system_state)]
