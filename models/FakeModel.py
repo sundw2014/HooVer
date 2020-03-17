@@ -14,17 +14,6 @@ num_dims = 2
 state_start = np.array([0,] * num_dims)
 state_range = np.array([1,] * num_dims)
 
-def random_initialization(seed, initial_states=None):
-    if initial_states is not None:
-        state = initial_states
-    else:
-        np.random.seed(np.abs(seed) % (2**32))
-        state = np.random.rand(len(state_start)) * state_range + state_start
-        state = state.tolist()
-    t = 1.
-    print('seed = '+str(seed)+', '+'state = '+str(state))
-    return state + [t, is_unsafe(state)]
-
 s = None
 
 def is_unsafe(state):
