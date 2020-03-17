@@ -32,17 +32,6 @@ unsafe_rule = 2
 
 T = 10
 
-def random_initialization(seed, initial_states=None):
-    if initial_states is not None:
-        state = initial_states
-    else:
-        np.random.seed(np.abs(seed) % (2**32))
-        state = np.random.rand(len(state_start)) * state_range + state_start
-        state = state.tolist()
-    t = 1.
-    print('seed = '+str(seed)+', '+'state = '+str(state))
-    return state + [t, is_unsafe(state)]
-
 def check_lane(car, lane):
     if len(lane) == 0:
         return True
