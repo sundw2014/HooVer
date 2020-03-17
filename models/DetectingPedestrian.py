@@ -22,17 +22,6 @@ v_error = 1.0
 
 T = 50
 
-def random_initialization(seed, initial_states=None):
-    if initial_states is not None:
-        state = initial_states
-    else:
-        np.random.seed(np.abs(seed) % (2**32))
-        state = np.random.rand(len(state_start)) * state_range + state_start
-        state = state.tolist()
-    t = 1.
-    print('seed = '+str(seed)+', '+'state = '+str(state))
-    return state + [t, is_unsafe(state)]
-
 def is_unsafe(state):
     if state[0] >= -5 and state[0] <= 0 and state[2] >= 0 and state[2] <= 5:
         return 1.0
