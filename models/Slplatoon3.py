@@ -30,17 +30,6 @@ state_range = np.array([range_of_initial_set_per_car, ] * num_cars)
 
 T = 11
 
-def random_initialization(seed, initial_states=None):
-    if initial_states is not None:
-        state = initial_states
-    else:
-        np.random.seed(np.abs(seed) % (2**32))
-        state = np.random.rand(len(state_start)) * state_range + state_start
-        state = state.tolist()
-    t = 1.
-    print('seed = '+str(seed)+', '+'state = '+str(state))
-    return state + [t, is_unsafe(state)]
-
 def is_unsafe(state):
     for i in range(1, len(state)):
         if state[i-1] - state[i] < unsafe_rule_close:
