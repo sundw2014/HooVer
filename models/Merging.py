@@ -38,18 +38,6 @@ lane0_end = lane0_initial_pos + 20
 
 T = 11
 
-def random_initialization(seed, initial_states=None):
-    if initial_states is not None:
-        state = initial_states
-    else:
-        np.random.seed(np.abs(seed) % (2**32))
-        state = np.random.rand(len(state_start)) * state_range + state_start
-        state = state.tolist()
-    # state: [lane1, lane0_pos, lane0_v, lane]
-    t = 1.
-    print('seed = '+str(seed)+', '+'state = '+str(state))
-    return state + [t, is_unsafe(state)]
-
 def check_lane(car, lane):
     if len(lane) == 0:
         return True
