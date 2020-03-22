@@ -7,6 +7,7 @@ import importlib
 import hoover
 import MFMC
 from utils.general_utils import loadpklz, savepklz
+import random
 
 if __name__ == '__main__':
     model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging', 'FakeModel']
@@ -26,6 +27,7 @@ if __name__ == '__main__':
     parser.add_argument('--nHOOs', type=int, default=4, help='number of HOO instances to use')
     parser.add_argument('--batch_size', type=int, default=100, help='batch size')
     parser.add_argument('--filename', type=str, default='./output.pklz', help='path to save the results')
+    parser.add_argument('--seed', type=int, default=1024, help='random seed for reproducibility')
     args = parser.parse_args()
 
     if 'FakeModel' in args.model:
@@ -48,6 +50,8 @@ if __name__ == '__main__':
     optimal_xs = []
     optimal_values = []
 
+    random.seed(args.seed)
+    np.random.seed(args.seed)
     for _ in range(num_exp):
         start_time = time.time()
         # import pdb; pdb.set_trace()
