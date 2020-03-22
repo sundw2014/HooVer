@@ -10,13 +10,8 @@ from utils.general_utils import loadpklz, savepklz
 
 # -----------------------------------------------------------------------------
 
-useHOO = True
 model = 'FakeModel'
-T = 1
-dim = 2
 exp_id = int(sys.argv[1])
-port_base = 9100
-plasmalab_root = '/root/plasmalab-1.4.4/'
 
 import models.FakeModel as simulator
 

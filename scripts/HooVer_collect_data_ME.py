@@ -1,27 +1,23 @@
-# Author: Rajat Sen # Modified by Negin
+# Author: Dawei Sun
 import sys
 sys.path.append('..')
 import numpy as np
-import subprocess
-from subprocess import DEVNULL, STDOUT, check_call
-import os, signal
+import os
+import importlib
 
-from utils.general_utils import loadpklz, savepklz
+from utils.general_utils import loadpklz, savepklz, evaluate_single_state
+import MFMC
 
 # -----------------------------------------------------------------------------
 
-useHOO = True
 model = 'Merging'
-T = 11
-dim = 6
 exp_id = int(sys.argv[1])
-port_base = 9100
-plasmalab_root = '/root/plasmalab-1.4.4/'
 
 if __name__ == '__main__':
     budgets = np.logspace(np.log(0.65 * 1e5)/np.log(2), np.log(5e5)/np.log(2), num=7, base=2).astype('int')
     outputs = []
     print('budgets: ' + str(budgets))
+    # run an experiment for each budget configuration
     for budget in budgets:
         filename = 'data/HooVer_%s_budget%d_exp%d.pklz'%(model, budget, exp_id)
         os.system('cd ../; python example.py --nRuns 1 --model %s --budget %d --filename %s'%(model, budget, filename))
@@ -33,26 +29,15 @@ if __name__ == '__main__':
     original_results = [o['optimal_values'][0] for o in outputs]
     num_queries = budgets
 
-    port = port_base + exp_id
-    tmp_model_name = 'model_%d'%port
-    tmp_spec_name = 'spec_%d'%port
-    with open(tmp_model_name, 'w') as f:
-        f.write('%d %d %d'%(dim, T+1, port))
-    with open(tmp_spec_name, 'w') as f:
-        f.write('F<=1000 (T<=%d & US>0)'%T)
-
+    # Monte-Carlo estimation of the hitting probability (using 250k simulations)
+    simulator = importlib.import_module('models.'+model)
+    MFMC.set_simulator(simulator)
+    _, mch = MFMC.get_mch_as_mf(batch_size = 1)
     for initial_states in optimal_xs:
         initial_states = initial_states.tolist()
-        # The os.setsid() is passed in the argument preexec_fn so
-        # it's run after the fork() and before  exec() to run the shell.
-        simulator = subprocess.Popen('cd ../; python simulator.py --model %s --port %d --initial_states '%(model, port) + ' '.join([str(s) for s in initial_states]), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
-        output = subprocess.check_output(plasmalab_root+'/plasmacli.sh launch -m '+tmp_model_name+':PythonSimulatorBridge -r '+tmp_spec_name+':bltl -a montecarlo -A "Total samples"=30000', universal_newlines=True, shell=True)
-        os.killpg(os.getpgid(simulator.pid), signal.SIGTERM)  # Send the signal to all the process groups
-
-        result = float(output.split('\n')[-3].split('|')[4])
+        np.random.seed(1024)
+        result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=250000)
         results.append(result)
         print(result)
 
     savepklz({'results':results, 'num_queries':num_queries, 'original_results':original_results}, '../data/HooVer_%s_exp%d.pklz'%(model, exp_id))
-    # from IPython import embed; embed()
-    os.system('rm '+tmp_model_name+' '+tmp_spec_name)

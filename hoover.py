@@ -11,7 +11,7 @@ def estimate_max_probability(mfobject, num_HOO, rho_max, sigma, budget, debug=Fa
                Randomize=False, Auto=True if not useHOO else False, unit_cost=mfobject.opt_fidel_cost, useHOO=useHOO, direct_budget=budget)
     MP.run_all_MFHOO()
     X, Depth, Cells = MP.get_point()
-    print(MP.t)
+    # print(MP.number_of_queries)
 
     init_state = np.zeros((1, mfobject.domain_dim))
     fidelity = mfobject.fidel_bounds[0][1]
@@ -50,6 +50,6 @@ def estimate_max_probability(mfobject, num_HOO, rho_max, sigma, budget, debug=Fa
         print('best max probability: %lf, memory usage: %.3f MB'%(best_value, memory_usage/1024.0/1024.0))
         print('----------------------------------------------------------------------')
 
-    return X[best_instance], best_value, np.max(Depth), memory_usage
+    return X[best_instance], best_value, np.max(Depth), memory_usage, sum(MP.number_of_queries)
 
 # -----------------------------------------------------------------------------

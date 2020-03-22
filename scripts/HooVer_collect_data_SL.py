@@ -15,7 +15,6 @@ exp_id = int(sys.argv[1])
 
 if __name__ == '__main__':
     budgets = np.logspace(np.log(0.85 * 1e5)/np.log(2), np.log(8e5)/np.log(2), num=6, base=2).astype('int')
-    budgets = np.array([50000,50001])
     outputs = []
     print('budgets: ' + str(budgets))
     # run an experiment for each budget configuration

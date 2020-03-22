@@ -49,6 +49,7 @@ if __name__ == '__main__':
     depths = []
     optimal_xs = []
     optimal_values = []
+    num_nodes = []
 
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -66,7 +67,7 @@ if __name__ == '__main__':
         rho_max = args.rho_max
 
         try:
-            optimal_x, optimal_value, depth, memory_usage = hoover.estimate_max_probability(mf_MCh_object, args.nHOOs, rho_max, sigma, budget_for_each_HOO)
+            optimal_x, optimal_value, depth, memory_usage, n_nodes = hoover.estimate_max_probability(mf_MCh_object, args.nHOOs, rho_max, sigma, budget_for_each_HOO)
         except AttributeError as e:
             print(e)
             continue
@@ -79,6 +80,7 @@ if __name__ == '__main__':
         optimal_values.append(optimal_value)
         optimal_xs.append(MFMC.get_full_state(optimal_x))
         depths.append(depth)
+        num_nodes.append(n_nodes)
 
     print('budget: ' + str(args.budget))
     print('running time (s): %.2f +/- %.3f'%(np.mean(running_times), np.std(running_times)))
@@ -86,4 +88,5 @@ if __name__ == '__main__':
     print('optimal_values: %.4f +/- %.5f'%(np.mean(optimal_values), np.std(optimal_values)))
     print('optimal_xs: '+str(optimal_xs))
     print('depth: ' + str(depths))
-    savepklz({'budget':args.budget, 'running_times':running_times, 'memory_usages':memory_usages, 'optimal_values':optimal_values, 'optimal_xs':optimal_xs, 'depths':depths}, args.filename)
+    print('number of nodes: ' + str(num_nodes))
+    savepklz({'budget':args.budget, 'running_times':running_times, 'memory_usages':memory_usages, 'optimal_values':optimal_values, 'optimal_xs':optimal_xs, 'depths':depths, 'num_nodes':num_nodes}, args.filename)
