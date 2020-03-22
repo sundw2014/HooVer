@@ -41,10 +41,6 @@ def step_forward(_state):
     state = np.array(_state[:-2])
     t = _state[-2]
 
-    if int(t)==1:
-        seed = int(time.time()*100000) % (2**32)
-        np.random.seed(seed)
-
     t = t + 1
 
     state_current = dllist(state)

@@ -3,7 +3,7 @@
 import numpy as np
 import sys
 sys.path.append('..')
-from utils.general_utils import llist_generator
+from utils.general_utils import llist_generator, temp_seed
 import time
 
 from llist import dllist, dllistnode
@@ -18,13 +18,11 @@ s = None
 
 def is_unsafe(state):
     prob = get_prob(state)
-    seed = int(time.time()*100000) % (2**32)
-    np.random.seed(seed)
     return np.random.choice([0., 1.], p=[1-prob, prob])
 
 def get_initial_state(seed):
-    np.random.seed(np.abs(seed) % (2**32))
-    state = np.random.rand(len(state_start)) * state_range + state_start
+    with temp_seed(np.abs(seed) % (2**32)):
+        state = np.random.rand(len(state_start)) * state_range + state_start
     state = state.tolist()
     t = 1.
     #print('seed = '+str(seed)+', '+'state = '+str(state))

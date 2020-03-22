@@ -8,6 +8,7 @@ import importlib
 
 import sys
 import argparse
+from utils.general_utils import temp_seed
 
 model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging', 'FakeModel']
 
@@ -38,14 +39,12 @@ context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:"+str(args.port))
 
-np.random.seed(1024)
-
 def random_initialization(seed, initial_states=None):
     if initial_states is not None:
         state = initial_states
     else:
-        np.random.seed(np.abs(seed) % (2**32))
-        state = np.random.rand(len(simulator.state_start)) * simulator.state_range + simulator.state_start
+        with temp_seed(np.abs(seed) % (2**32)):
+            state = np.random.rand(len(simulator.state_start)) * simulator.state_range + simulator.state_start
         state = state.tolist()
     t = 1.
     print('seed = '+str(seed)+', '+'state = '+str(state))

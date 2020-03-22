@@ -72,9 +72,6 @@ def step_forward(_state):
     assert len(_state) == num_cars_lane_1 + 3 + 2
     state = _state[:-2]
     t = _state[-2]
-    if int(t)==1:
-        seed = int(time.time()*100000) % (2**32)
-        np.random.seed(seed)
 
     t = t + 1
 

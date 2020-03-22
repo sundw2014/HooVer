@@ -11,6 +11,7 @@
 import numpy as np
 import gzip
 import pickle
+import contextlib
 
 def compare_dict(dict_1, dict_2):
     """ Compares two dictionaries. """
@@ -141,3 +142,21 @@ def loadpklz(dump_file_full_name):
         dump_data = pickle.load(in_file)
 
     return dump_data
+
+def evaluate_single_state(run_markov_chain, init_state, budget, mult=10000):
+    init_state = np.array(init_state).reshape(1,-1)
+    true_max_prob = 0
+    for i in range(mult):
+        reward = run_markov_chain(init_state, budget)
+        true_max_prob = true_max_prob + reward
+    true_max_prob = true_max_prob / mult
+    return true_max_prob
+
+@contextlib.contextmanager
+def temp_seed(seed):
+    state = np.random.get_state()
+    np.random.seed(seed)
+    try:
+        yield
+    finally:
+        np.random.set_state(state)
