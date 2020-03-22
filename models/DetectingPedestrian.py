@@ -58,8 +58,8 @@ def step_forward(_state):
     def lidar_prob(theta, r):
         s = 5e-6
         theta_broken = 0.08
-        r_max = 10000
-        prob = (1 - np.exp(-1.0 * (theta - theta_broken) ** 2 / s))# * ((r - r_max) ** 2 / (r_max ** 2))
+        r_max = 500
+        prob = (1 - np.exp(-1.0 * (theta - theta_broken) ** 2 / s)) * ((r - r_max) ** 2 / (r_max ** 2))
         return prob
 
     if state[0] > 0:
