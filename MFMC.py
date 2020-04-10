@@ -41,8 +41,14 @@ def get_mch():
 # -----------------------------------------------------------------------------
 
 def get_full_state(_state):
+    _state = _state.reshape(-1)
     state = state_start.copy()
-    state[index_non_const_dims] = _state.reshape(-1)
+    if len(_state) == len(index_non_const_dims):
+        state[index_non_const_dims] = _state
+    elif len(_state) == len(state):
+        state[:] = _state
+    else:
+        raise ValueError('Wrong size')
     return state
 
 class MarkovChain(object):
