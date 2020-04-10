@@ -20,14 +20,6 @@ def is_unsafe(state):
     prob = get_prob(state)
     return np.random.choice([0., 1.], p=[1-prob, prob])
 
-def get_initial_state(seed):
-    with temp_seed(np.abs(seed) % (2**32)):
-        state = np.random.rand(len(state_start)) * state_range + state_start
-    state = state.tolist()
-    t = 1.
-    #print('seed = '+str(seed)+', '+'state = '+str(state))
-    return state + [t, is_unsafe(state)]
-
 def get_prob(state):
     center = state_start + 0.5 * state_range
     r = np.sqrt(np.sum((state-center)**2))
@@ -39,10 +31,6 @@ def step_forward(_state):
     assert len(_state) == num_dims + 2
     state = _state[:-2]
     t = _state[-2]
-
-    if int(t)==1:
-        seed = int(time.time()*100000) % (2**32)
-        np.random.seed(seed)
 
     t = t + 1
 

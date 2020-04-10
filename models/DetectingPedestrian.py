@@ -15,20 +15,21 @@ states = [car_pos_range, car_v_range, ped_pos_range, ped_v_range]
 state_start = np.array([state[0] for state in states])
 state_range = np.array([state[1] - state[0] for state in states])
 
-time_step = 0.1 # 0.1 s
+time_step = 0.25 # 0.25 s
 brake_acc = 8 # m/s^2
 
-v_error = 1.0
+v_error = 0.
 
-T = 50
+T = 10
 
 def is_unsafe(state):
-    if state[0] >= -5 and state[0] <= 0 and state[2] >= 0 and state[2] <= 5:
+    if state[0] >= -5 and state[0] <= 0 and state[2] >= -1 and state[2] <= 1:
         return 1.0
     else:
         return 0.
 
 def step_forward(_state):
+    # print(_state)
     assert len(_state) == len(state_start) + 2
     state = list(_state[:-2])
     t = _state[-2]
@@ -37,12 +38,23 @@ def step_forward(_state):
 
     # real_t = t * time_step
 
-    state[0] -= (state[1] + np.random.randn() * v_error * 0.1) * time_step
-    state[2] -= (state[3] + np.random.randn() * v_error) * time_step
+    # this is an unsafe lidar model
+    def lidar_prob(theta, r):
+        s = 5e-6
+        theta_broken = 0.08
+        r_max = 500
+        prob = (1 - np.exp(-1.0 * (theta - theta_broken) ** 2 / s)) * ((r - r_max) ** 2 / (r_max ** 2))
+        return prob
 
-    prob = 0.1 * (1 - np.sqrt(state[0] ** 2 + (state[2]*10) ** 2) / np.sqrt(car_pos_range[1] ** 2 + (ped_pos_range[1]*10) ** 2))
+    if state[0] > 0:
+        theta = np.arctan(state[2] / state[0])
+        r = np.sqrt(state[2] ** 2 + state[0] ** 2)
+        prob = min(max(lidar_prob(theta, r), 0), 1)
+    else:
+        prob = 0
 
     if np.random.rand() < prob:
+        # print('detected')
         # detected
         brake_distance = state[1] ** 2 / (2 * brake_acc)
 
@@ -51,4 +63,8 @@ def step_forward(_state):
         state[2] -= state[3] * time_to_zero
         state[0] = 0.
         state[1] = 0.
+
+    state[0] -= (state[1] + np.random.randn() * v_error * 0.1) * time_step
+    state[2] -= (state[3] + np.random.randn() * v_error) * time_step
+
     return state + [t, is_unsafe(state)]
