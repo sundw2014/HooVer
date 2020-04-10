@@ -28,8 +28,10 @@ if __name__ == '__main__':
 
     results_ho = np.array(results_ho)
 
-print('rhomax: '+' '.join([str(s) for s in rhomaxs]))
-print('Depth: '+' '.join([str(s) for s in depth]))
-print('Result: '+' '.join([str(s) for s in results_ho.mean(axis=0)]))
-# from IPython import embed;
-# embed()
+print('\\hline')
+print('${\\bf \\rho_{max}}$ & '+(' & '.join(['%.2f' for _ in range(len(rhomaxs))]))%tuple(rhomaxs)+'\\\\')
+print('\\hline')
+print('{\\bf Tree depth} & '+(' & '.join(['%.1f' for _ in range(len(rhomaxs))]))%tuple(depth)+'\\\\')
+print('\\hline')
+print('{\\bf Result\/} & '+(' & '.join(['%.4f' for _ in range(len(rhomaxs))]))%tuple(results_ho.mean(axis=0))+'\\\\')
+print('\\hline')

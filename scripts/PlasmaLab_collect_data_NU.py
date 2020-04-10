@@ -5,16 +5,21 @@ import subprocess
 from subprocess import DEVNULL, STDOUT, check_call
 import os, signal
 
-from utils.general_utils import loadpklz, savepklz
+from utils.general_utils import loadpklz, savepklz, temp_seed
 
 model = 'FakeModel'
 T = 1
 dim = 2
 exp_id = int(sys.argv[1])
 port_base = 9100
-plasmalab_root = '/root/plasmalab-1.4.4/'
+plasmalab_root = '/home/daweis2/plasmalab-1.4.4/'
 
 import models.FakeModel as FakeModel
+def get_initial_state(seed):
+    with temp_seed(np.abs(seed) % (2**32)):
+        state = np.random.rand(len(FakeModel.state_start)) * FakeModel.state_range + FakeModel.state_start
+    state = state.tolist()
+    return state
 
 if __name__ == '__main__':
     budget = int(400000 / 16)
@@ -56,12 +61,12 @@ if __name__ == '__main__':
         final_iter = set(final_iter)
         original_results.append(float(output[-2].split('|')[2]))
 
+        final_iter = [get_initial_state(seed) for seed in final_iter]
         tmp_results = []
         print(final_iter)
-        for seed in final_iter:
-            state = FakeModel.random_initialization(seed)[:-2]
-            tmp_results.append(FakeModel.get_prob(state))
+        for initial_states in final_iter:
+            tmp_results.append(FakeModel.get_prob(initial_states))
         results.append(np.max(tmp_results))
-
+print({'results':results, 'ss':ss, 'original_results':original_results})
 savepklz({'results':results, 'ss':ss, 'original_results':original_results}, '../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))
 os.system('rm '+tmp_model_name+' '+tmp_spec_name)

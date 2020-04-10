@@ -4,15 +4,25 @@ import numpy as np
 import subprocess
 from subprocess import DEVNULL, STDOUT, check_call
 import os, signal
+import importlib
 
-from utils.general_utils import loadpklz, savepklz
+from utils.general_utils import loadpklz, savepklz, evaluate_single_state, temp_seed
+import MFMC
 
 model = 'Mlplatoon'
-T = 10
-dim = 18
+simulator = importlib.import_module('models.'+model)
+
+T = simulator.T
+dim = len(simulator.state_start)
 exp_id = int(sys.argv[1])
 port_base = 9100
-plasmalab_root = '/root/plasmalab-1.4.4/'
+plasmalab_root = '/home/daweis2/plasmalab-1.4.4/'
+
+def get_initial_state(seed):
+    with temp_seed(np.abs(seed) % (2**32)):
+        state = np.random.rand(len(simulator.state_start)) * simulator.state_range + simulator.state_start
+    state = state.tolist()
+    return state
 
 if __name__ == '__main__':
     budgets = np.logspace(np.log(0.85 * 1e5)/np.log(2), np.log(8e5)/np.log(2), num=6, base=2).astype('int')
@@ -29,8 +39,8 @@ if __name__ == '__main__':
         f.write('F<=1000 (T<=%d & US>0)'%T)
 
     results = []
-    num_queries = budgets
     original_results = []
+    num_queries = budgets * 16.0
 
     for budget in budgets:
         #delta = 2 / np.exp((budget*0.8)*2*(epsilon**2))
@@ -38,9 +48,9 @@ if __name__ == '__main__':
         print(epsilon, delta, budget)
         # The os.setsid() is passed in the argument preexec_fn so
         # it's run after the fork() and before  exec() to run the shell.
-        simulator = subprocess.Popen('cd ../; python simulator.py --model %s --port %d'%(model, port), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
+        _simulator = subprocess.Popen('cd ../; python simulator.py --model %s --port %d'%(model, port), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
         output = subprocess.check_output(plasmalab_root+'/plasmacli.sh launch -m '+tmp_model_name+':PythonSimulatorBridge -r '+tmp_spec_name+':bltl -a smartsampling -A"Maximum"=True -A"Epsilon"=%lf -A"Delta"=%lf -A"Budget"=%d'%(epsilon, delta, budget), universal_newlines=True, shell=True)
-        os.killpg(os.getpgid(simulator.pid), signal.SIGTERM)  # Send the signal to all the process groups
+        os.killpg(os.getpgid(_simulator.pid), signal.SIGTERM)  # Send the signal to all the process groups
         with open('../data/PlasmaLab_%s_epsilon%lf_delta%lf_budget%d_exp%d.txt'%(model, epsilon, delta, budget, exp_id), 'w') as f:
             f.write(output)
 
@@ -53,16 +63,23 @@ if __name__ == '__main__':
         final_iter = [int(line.split(' ')[3]) for line in seeds[-budget+10::]]
         final_iter = set(final_iter)
         original_results.append(float(output[-2].split('|')[2]))
-
+        # print(original_results)
+        final_iter = [get_initial_state(seed) for seed in final_iter]
         tmp_results = []
-        for seed in final_iter:
-            # The os.setsid() is passed in the argument preexec_fn so
-            # it's run after the fork() and before  exec() to run the shell.
-            simulator = subprocess.Popen('cd ../; python simulator.py --model %s --port %d --seed %d'%(model, port, seed), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
-            output = subprocess.check_output(plasmalab_root+'/plasmacli.sh launch -m '+tmp_model_name+':PythonSimulatorBridge -r '+tmp_spec_name+':bltl -a montecarlo -A "Total samples"=30000', universal_newlines=True, shell=True)
-            os.killpg(os.getpgid(simulator.pid), signal.SIGTERM)  # Send the signal to all the process groups
-            tmp_results.append(float(output.split('\n')[-3].split('|')[4]))
-        results.append(np.max(tmp_results))
+        MFMC.set_simulator(simulator)
+        _, mch = MFMC.get_mch_as_mf(batch_size = 1)
+        print(final_iter)
+        for initial_states in final_iter:
+            np.random.seed(1024)
+            result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=10000)
+            tmp_results.append(result)
+        print(tmp_results)
+        initial_states = final_iter[np.argmax(tmp_results)]
+        np.random.seed(1024)
+        result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=250000)
+        print(result)
 
+        results.append(result)
+print({'results':results, 'num_queries':num_queries, 'original_results':original_results})
 savepklz({'results':results, 'num_queries':num_queries, 'original_results':original_results}, '../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))
 os.system('rm '+tmp_model_name+' '+tmp_spec_name)
