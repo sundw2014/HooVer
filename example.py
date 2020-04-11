@@ -3,14 +3,17 @@
 import argparse
 import numpy as np
 import time
-import importlib
 import hoover
 from utils.general_utils import loadpklz, savepklz
 import random
-from models.DetectingPedestrian import DetectingPedestrian as Model
+
+import models
+
+model_names = sorted(name for name in models.__dict__
+    if not name.startswith("__")
+    and callable(models.__dict__[name]))
 
 if __name__ == '__main__':
-    model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging', 'FakeModel']
     # true_max_probs = dict(zip(model_names, true_max_probs))
 
     parser = argparse.ArgumentParser(description="")
@@ -20,6 +23,7 @@ if __name__ == '__main__':
                         help='models available: ' +
                             ' | '.join(model_names) +
                             ' (default: Slplatoon3)')
+    parser.add_argument('--args', nargs='+', type=float, help='<Optional>')
     parser.add_argument('--nRuns', type=int, default=1, help='number of runs')
     parser.add_argument('--budget', type=int, default=int(1e6), help='budget for number of simulations')
     parser.add_argument('--rho_max', type=float, default=0.6, help='time budget for simulator')
@@ -30,13 +34,12 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1024, help='random seed for reproducibility')
     args = parser.parse_args()
 
-    # if 'FakeModel' in args.model:
-    #     s = float(args.model[10:])
-    #     simulator = importlib.import_module('models.FakeModel')
-    #     simulator.s = s
-    #     print(simulator.s)
-    # else:
-    #     simulator = importlib.import_module('models.'+args.model)
+    if args.model == 'FakeModel':
+        if args.args is None:
+            raise ValueError('Please specify the s parameter using --args')
+        model = models.__dict__[args.model](s = args.args[0])
+    else:
+        model = models.__dict__[args.model]()
 
     num_exp = args.nRuns
 
@@ -54,7 +57,7 @@ if __name__ == '__main__':
     for _ in range(num_exp):
         start_time = time.time()
         # import pdb; pdb.set_trace()
-        nimc = Model()
+        nimc = model
 
         if args.sigma is None:
             sigma = np.sqrt(0.5*0.5/args.batch_size)

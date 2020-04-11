@@ -3,6 +3,8 @@ import sys
 sys.path.append('..')
 from NiMC import NiMC
 
+__all__ = ['DetectingPedestrian']
+
 # some constants
 car_pos_range = [50, 100]
 car_v_range = [10, 25]

@@ -3,10 +3,9 @@ import sys
 sys.path.append('..')
 import numpy as np
 import os
-import importlib
 
 from utils.general_utils import loadpklz, savepklz, evaluate_single_state
-import MFMC
+import models
 
 # -----------------------------------------------------------------------------
 
@@ -30,13 +29,11 @@ if __name__ == '__main__':
     num_queries = budgets
 
     # Monte-Carlo estimation of the hitting probability (using 250k simulations)
-    simulator = importlib.import_module('models.'+model)
-    MFMC.set_simulator(simulator)
-    _, mch = MFMC.get_mch_as_mf(batch_size = 1)
+    model = models.__dict__[model]
     for initial_states in optimal_xs:
         initial_states = initial_states.tolist()
         np.random.seed(1024)
-        result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=250000)
+        result = evaluate_single_state(model, initial_states, simulator.T, mult=250000)
         results.append(result)
         print(result)
 
