@@ -26,7 +26,7 @@ def estimate_max_probability(nimc, num_HOO, rho_max, sigma, budget, batch_size, 
         for i in range(mult):
             reward = mfobject.reward_function(init_state, fidelity)
             value = value + reward
-        value = value / (mfobject.max_iteration * mult)
+        value = value / (mult)
         return value
 
     mult = 10000
