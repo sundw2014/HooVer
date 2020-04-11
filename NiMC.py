@@ -12,10 +12,12 @@ class NiMC(object):
         self.cnt_queries = 0
 
     def transition(self):
-        pass
+        raise NotImplementedError('The new model file\
+         has to implement the transition() and is_unsafe() functions.')
 
     def is_unsafe(self):
-        pass
+        raise NotImplementedError('The new model file\
+         has to implement the transition() and is_unsafe() functions.')
 
     def set_Theta(self, Theta):
         Theta = np.array(Theta).astype('float') # [[l1,u1],[l2,u2],[l3,u3],...]
