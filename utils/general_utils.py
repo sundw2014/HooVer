@@ -144,10 +144,10 @@ def loadpklz(dump_file_full_name):
     return dump_data
 
 def evaluate_single_state(run_markov_chain, init_state, budget, mult=10000):
-    init_state = np.array(init_state).reshape(1,-1)
+    init_state = np.array(init_state).reshape(-1).tolist()
     true_max_prob = 0
     for i in range(mult):
-        reward = run_markov_chain(init_state, budget)
+        reward = run_markov_chain(init_state.copy(), budget)
         true_max_prob = true_max_prob + reward
     true_max_prob = true_max_prob / mult
     return true_max_prob

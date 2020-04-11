@@ -47,4 +47,5 @@ class NiMC(object):
         return reward
 
     def __call__(self, initial_state, k=None):
-        self.simulate(init_state, k)
+        return self.simulate(initial_state, k)
+
