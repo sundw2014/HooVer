@@ -5,9 +5,9 @@ import numpy as np
 import time
 import importlib
 import hoover
-import MFMC
 from utils.general_utils import loadpklz, savepklz
 import random
+from models.DetectingPedestrain import DetectingPedestrian as Model
 
 if __name__ == '__main__':
     model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging', 'FakeModel']
@@ -30,15 +30,13 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1024, help='random seed for reproducibility')
     args = parser.parse_args()
 
-    if 'FakeModel' in args.model:
-        s = float(args.model[10:])
-        simulator = importlib.import_module('models.FakeModel')
-        simulator.s = s
-        print(simulator.s)
-    else:
-        simulator = importlib.import_module('models.'+args.model)
-
-    MFMC.set_simulator(simulator)
+    # if 'FakeModel' in args.model:
+    #     s = float(args.model[10:])
+    #     simulator = importlib.import_module('models.FakeModel')
+    #     simulator.s = s
+    #     print(simulator.s)
+    # else:
+    #     simulator = importlib.import_module('models.'+args.model)
 
     num_exp = args.nRuns
 
@@ -56,8 +54,7 @@ if __name__ == '__main__':
     for _ in range(num_exp):
         start_time = time.time()
         # import pdb; pdb.set_trace()
-        MCh_object, MCh = MFMC.get_mch_as_mf(args.batch_size)
-        mf_MCh_object = MFMC.MFMarkovChain.mf_markov_chain(MCh_object)
+        nimc = Model()
 
         if args.sigma is None:
             sigma = np.sqrt(0.5*0.5/args.batch_size)
@@ -67,7 +64,8 @@ if __name__ == '__main__':
         rho_max = args.rho_max
 
         try:
-            optimal_x, optimal_value, depth, memory_usage, n_nodes = hoover.estimate_max_probability(mf_MCh_object, args.nHOOs, rho_max, sigma, budget_for_each_HOO)
+            optimal_x, optimal_value, depth, memory_usage, n_nodes =
+             hoover.estimate_max_probability(nimc), args.nHOOs, rho_max, sigma, budget_for_each_HOO, batch_size)
         except AttributeError as e:
             print(e)
             continue
@@ -78,7 +76,7 @@ if __name__ == '__main__':
         running_times.append(running_time)
         memory_usages.append(memory_usage/1024.0/1024.0)
         optimal_values.append(optimal_value)
-        optimal_xs.append(MFMC.get_full_state(optimal_x))
+        optimal_xs.append(optimal_x)
         depths.append(depth)
         num_nodes.append(n_nodes)
 
