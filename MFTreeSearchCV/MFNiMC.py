@@ -20,13 +20,13 @@ class MFNiMC(object):
 
         def reward_function(initial_state, fidel):
             initial_state = self.get_full_state(initial_state).tolist()
-            reward = NiMC.simulate(state, fidel)
+            reward = NiMC.simulate(initial_state, fidel)
             return reward
 
         self.reward_function = reward_function
 
-        self.domain_bounds = NiMC.Theta[Theta_index_non_const_dims, :]
-        self.domain_dim = len(Theta_index_non_const_dims)
+        self.domain_bounds = NiMC.Theta[self.Theta_index_non_const_dims, :]
+        self.domain_dim = len(self.Theta_index_non_const_dims)
 
         if hasattr(NiMC, 'fidel_cost_function'):
             fidel_cost_function = NiMC.fidel_cost_function
@@ -51,6 +51,7 @@ class MFNiMC(object):
             state[:] = _state
         else:
             raise ValueError('Wrong size')
+        return state
 
     # -----------------------------------------------------------------------------
 

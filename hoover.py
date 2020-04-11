@@ -6,7 +6,7 @@ from MFTreeSearchCV.MFNiMC import MFNiMC
 
 useHOO = True
 
-def estimate_max_probability(nimc, num_HOO, rho_max, sigma, budget, debug=False, batch_size):
+def estimate_max_probability(nimc, num_HOO, rho_max, sigma, budget, batch_size, debug=False):
     mfobject = MFNiMC(nimc, batch_size)
     MP = MFPOO(mfobject=mfobject, nu_max=1.0, rho_max=rho_max, nHOO=num_HOO, sigma=sigma, C=0.1, mult=0.5, tol=1e-3,
                Randomize=False, Auto=True if not useHOO else False, unit_cost=mfobject.opt_fidel_cost, useHOO=useHOO, direct_budget=budget)

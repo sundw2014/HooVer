@@ -7,7 +7,7 @@ import importlib
 import hoover
 from utils.general_utils import loadpklz, savepklz
 import random
-from models.DetectingPedestrain import DetectingPedestrian as Model
+from models.DetectingPedestrian import DetectingPedestrian as Model
 
 if __name__ == '__main__':
     model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging', 'FakeModel']
@@ -64,8 +64,8 @@ if __name__ == '__main__':
         rho_max = args.rho_max
 
         try:
-            optimal_x, optimal_value, depth, memory_usage, n_nodes =
-             hoover.estimate_max_probability(nimc), args.nHOOs, rho_max, sigma, budget_for_each_HOO, batch_size)
+            optimal_x, optimal_value, depth, memory_usage, n_nodes =\
+             hoover.estimate_max_probability(nimc, args.nHOOs, rho_max, sigma, budget_for_each_HOO, args.batch_size)
         except AttributeError as e:
             print(e)
             continue

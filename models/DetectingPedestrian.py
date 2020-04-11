@@ -1,5 +1,7 @@
 import numpy as np
-from ..NiMC import NiMC
+import sys
+sys.path.append('..')
+from NiMC import NiMC
 
 # some constants
 car_pos_range = [50, 100]
@@ -19,19 +21,19 @@ r_max = 500
 
 k = 10
 
-class DetectingPedestrain(NiMC):
+class DetectingPedestrian(NiMC):
     def __init__(self):
-        super(DetectingPedestrain, self).__init__()
+        super(DetectingPedestrian, self).__init__()
         self.set_Theta(Theta)
         self.set_k(k)
 
-    def is_unsafe(state):
+    def is_unsafe(self, state):
         if state[0] >= -5 and state[0] <= 0 and state[2] >= -1 and state[2] <= 1:
-            return 1.0
+            return True
         else:
-            return 0.
+            return False
 
-    def transition(state):
+    def transition(self, state):
         # print(_state)
         assert len(state) == len(Theta)
 
@@ -61,4 +63,4 @@ class DetectingPedestrain(NiMC):
         state[0] -= (state[1] + np.random.randn() * v_error * 0.1) * time_step
         state[2] -= (state[3] + np.random.randn() * v_error) * time_step
 
-    return state
+        return state

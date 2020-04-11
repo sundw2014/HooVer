@@ -31,10 +31,10 @@ class NiMC(object):
         if k is None:
             k = self.k
 
-        state = initial_state.tolist()
+        state = initial_state
 
         unsafe = self.is_unsafe(state)
-        for step in range(k):
+        for step in range(int(k)):
             if unsafe:
                 break
             else:
