@@ -51,13 +51,15 @@ def random_initialization(seed, initial_states=None):
         state = initial_states
     else:
         with temp_seed(np.abs(seed) % (2**32)):
-            state = np.random.rand(model.Theta.shape[0])
-              * (model.Theta[:,1] - model.Theta[:,0])
+            state = np.random.rand(model.Theta.shape[0])\
+              * (model.Theta[:,1] - model.Theta[:,0])\
               + model.Theta[:,0]
         state = state.tolist()
     t = 0.
     print('seed = '+str(seed)+', '+'state = '+str(state))
-    return state + [t, model.is_unsafe(state)]
+    is_unsafe = model.is_unsafe(state)
+    is_unsafe = 1. if is_unsafe else 0.
+    return state + [t, is_unsafe]
 
 while True:
     #  Wait for next request from client
@@ -73,7 +75,9 @@ while True:
     else:
         t = t+1
         new_state = model.transition(list(state)[0:-2])
-        state = new_state + [t, model.is_unsafe(new_state)))]
+        is_unsafe = model.is_unsafe(state)
+        is_unsafe = 1. if is_unsafe else 0.
+        state = new_state + [t, is_unsafe]
 
     #print('send: ', state)
     #  Send reply back to client
