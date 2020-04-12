@@ -4,23 +4,25 @@ import numpy as np
 import subprocess
 from subprocess import DEVNULL, STDOUT, check_call
 import os, signal
-import importlib
 
 from utils.general_utils import loadpklz, savepklz, evaluate_single_state, temp_seed
-import MFMC
+
+import models
 
 model = 'Merging'
-simulator = importlib.import_module('models.'+model)
+nimc = models.__dict__[model]()
 
-T = simulator.T
-dim = len(simulator.state_start)
+T = nimc.k
+dim = nimc.Theta.shape[0]
 exp_id = int(sys.argv[1])
 port_base = 9100
 plasmalab_root = '/home/daweis2/plasmalab-1.4.4/'
 
 def get_initial_state(seed):
     with temp_seed(np.abs(seed) % (2**32)):
-        state = np.random.rand(len(simulator.state_start)) * simulator.state_range + simulator.state_start
+        state = np.random.rand(nimc.Theta.shape[0])\
+          * (nimc.Theta[:,1] - nimc.Theta[:,0])\
+          + nimc.Theta[:,0]
     state = state.tolist()
     return state
 
@@ -66,15 +68,13 @@ if __name__ == '__main__':
         # print(original_results)
         final_iter = [get_initial_state(seed) for seed in final_iter]
         tmp_results = []
-        MFMC.set_simulator(simulator)
-        _, mch = MFMC.get_mch_as_mf(batch_size = 1)
         for initial_states in final_iter:
             np.random.seed(1024)
-            result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=10000)
+            result = evaluate_single_state(nimc, initial_states, nimc.k, mult=10000)
             tmp_results.append(result)
         initial_states = final_iter[np.argmax(tmp_results)]
         np.random.seed(1024)
-        result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=250000)
+        result = evaluate_single_state(nimc, initial_states, nimc.k, mult=250000)
         print(result)
 
         results.append(result)
