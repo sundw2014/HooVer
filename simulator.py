@@ -75,7 +75,7 @@ while True:
     else:
         t = t+1
         new_state = model.transition(list(state)[0:-2])
-        is_unsafe = model.is_unsafe(state)
+        is_unsafe = model.is_unsafe(new_state)
         is_unsafe = 1. if is_unsafe else 0.
         state = new_state + [t, is_unsafe]
 
