@@ -132,8 +132,8 @@ public class PythonSimulatorBridge extends AbstractModel {
 		trace = new ArrayList<InterfaceState>();
 
 		// Create serialize objects.
-		// set time = 0, unsafe_flag, and seed
-		internal_state[internal_state.length-3] = 0;
+		// set time = -1, unsafe_flag, and seed
+		internal_state[internal_state.length-3] = -1;
 		internal_state[internal_state.length-2] = 0;
                 long seed = arg0 % 4294967296l;
 		internal_state[internal_state.length-1] = (double) (seed);
@@ -167,7 +167,7 @@ public class PythonSimulatorBridge extends AbstractModel {
 	@Override
     public InterfaceState simulate() throws PlasmaSimulatorException {
 			MyState currentState = (MyState) getCurrentState();
-			if (currentState.time > T_MAX)
+			if (currentState.time >= T_MAX)
 				throw new PlasmaDeadlockException(getCurrentState(), getTraceLength());
 			// Create serialize objects.
 			// set time = 0, unsafe_flag, and seed
