@@ -29,11 +29,11 @@ if __name__ == '__main__':
     num_queries = budgets
 
     # Monte-Carlo estimation of the hitting probability (using 250k simulations)
-    model = models.__dict__[model]()
+    nimc = models.__dict__[model]()
     for initial_states in optimal_xs:
         initial_states = initial_states.tolist()
         np.random.seed(1024)
-        result = evaluate_single_state(model, initial_states, model.k, mult=250000)
+        result = evaluate_single_state(nimc, initial_states, nimc.k, mult=250000)
         results.append(result)
         print(result)
 
