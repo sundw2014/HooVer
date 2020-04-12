@@ -28,6 +28,7 @@ def get_initial_state(seed):
 
 if __name__ == '__main__':
     budgets = np.logspace(np.log(0.85 * 1e5)/np.log(2), np.log(8e5)/np.log(2), num=6, base=2).astype('int')
+    budgets = [1000,]
     budgets = (budgets/16.0).astype('int')
     #epsilon = 0.01
     delta = 0.01
