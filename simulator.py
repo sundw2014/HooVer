@@ -4,13 +4,16 @@ import time
 import zmq
 import numpy as np
 import msgpack
-import importlib
 
 import sys
 import argparse
 from utils.general_utils import temp_seed
 
-model_names = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging', 'FakeModel']
+import models
+
+model_names = sorted(name for name in models.__dict__
+    if not name.startswith("__")
+    and callable(models.__dict__[name]))
 
 parser = argparse.ArgumentParser(description='')
 
@@ -20,20 +23,24 @@ parser.add_argument('--model', metavar='MODEL',
                         help='models available: ' +
                             ' | '.join(model_names) +
                             ' (default: Slplatoon3)')
+parser.add_argument('--args', nargs='+', type=float, help='<Optional>')
 parser.add_argument('--initial_states', nargs='+', type=float, help='<Optional>')
-parser.add_argument('--seed', type=int, help='<Optional>')
+parser.add_argument('--seed', type=int, default=1024, help='<Optional>')
 parser.add_argument('--port', type=int, help='', required=True)
 
 args = parser.parse_args()
 
+np.random.seed(args.seed)
+
 assert (args.initial_states is None or args.seed is None)
 
-if 'FakeModel' in args.model:
-    s = float(args.model[10:])
-    simulator = importlib.import_module('models.FakeModel')
-    simulator.s = s
+
+if args.model == 'FakeModel':
+    if args.args is None:
+        raise ValueError('Please specify the s parameter using --args')
+    model = models.__dict__[args.model](s = args.args[0])
 else:
-    simulator = importlib.import_module('models.'+args.model)
+    model = models.__dict__[args.model]()
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
@@ -44,11 +51,13 @@ def random_initialization(seed, initial_states=None):
         state = initial_states
     else:
         with temp_seed(np.abs(seed) % (2**32)):
-            state = np.random.rand(len(simulator.state_start)) * simulator.state_range + simulator.state_start
+            state = np.random.rand(model.Theta.shape[0])
+              * (model.Theta[:,1] - model.Theta[:,0])
+              + model.Theta[:,0]
         state = state.tolist()
-    t = 1.
+    t = 0.
     print('seed = '+str(seed)+', '+'state = '+str(state))
-    return state + [t, simulator.is_unsafe(state)]
+    return state + [t, model.is_unsafe(state)]
 
 while True:
     #  Wait for next request from client
@@ -58,15 +67,13 @@ while True:
     state = _message[:-1]
     seed = int(_message[-1])
     # from IPython import embed; embed()
-    if int(state[-2]) == 0: # t == 0
-        if args.seed is not None:
-            state = random_initialization(args.seed)
-        elif args.initial_states is not None:
-            state = random_initialization(0, args.initial_states)
-        else:
-            state = random_initialization(seed)
+    t = state[-2]
+    if t < 0: # t == -1 for requesting initialization
+        state = random_initialization(seed)
     else:
-        state = simulator.step_forward(list(state))
+        t = t+1
+        new_state = model.transition(list(state)[0:-2])
+        state = new_state + [t, model.is_unsafe(new_state)))]
 
     #print('send: ', state)
     #  Send reply back to client
