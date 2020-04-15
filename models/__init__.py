@@ -1,5 +1,5 @@
 from .DetectingPedestrian import *
-from .FakeModel import *
+from .ConceptualModel import *
 from .Merging import *
 from .MyModel import *
 from .Slplatoon import *

@@ -35,7 +35,7 @@ np.random.seed(args.seed)
 assert (args.initial_states is None or args.seed is None)
 
 
-if args.model == 'FakeModel':
+if args.model == 'ConceptualModel':
     if args.args is None:
         raise ValueError('Please specify the s parameter using --args')
     model = models.__dict__[args.model](s = args.args[0])

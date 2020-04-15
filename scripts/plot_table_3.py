@@ -8,7 +8,7 @@ ss_pl = []
 results_ho = []
 ss_ho = []
 
-model = 'FakeModel'
+model = 'ConceptualModel'
 
 for exp_id in range(1, 10):
     results_pl.append(loadpklz('../data/PlasmaLab_%s_exp%d.pklz'%(model, exp_id))['results'])

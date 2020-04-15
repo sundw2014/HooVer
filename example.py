@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1024, help='random seed for reproducibility')
     args = parser.parse_args()
 
-    if args.model == 'FakeModel':
+    if args.model == 'ConceptualModel':
         if args.args is None:
             raise ValueError('Please specify the s parameter using --args')
         model = models.__dict__[args.model](s = args.args[0])

@@ -9,7 +9,7 @@ from utils.general_utils import loadpklz, savepklz, evaluate_single_state, temp_
 
 import models
 
-model = 'FakeModel'
+model = 'ConceptualModel'
 nimc = models.__dict__[model]()
 
 T = nimc.k

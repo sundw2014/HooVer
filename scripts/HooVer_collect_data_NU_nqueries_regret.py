@@ -8,7 +8,7 @@ import models
 
 # -----------------------------------------------------------------------------
 
-model = 'FakeModel'
+model = 'ConceptualModel'
 exp_id = int(sys.argv[1])
 
 if __name__ == '__main__':

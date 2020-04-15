@@ -3,11 +3,11 @@ import sys
 sys.path.append('..')
 from NiMC import NiMC
 
-__all__ = ['FakeModel']
+__all__ = ['ConceptualModel']
 
-class FakeModel(NiMC):
+class ConceptualModel(NiMC):
     def __init__(self, s):
-        super(FakeModel, self).__init__()
+        super(ConceptualModel, self).__init__()
         self.s = s
         self.set_Theta([[0,1],[0,1]])
         self.set_k(0)

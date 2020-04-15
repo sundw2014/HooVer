@@ -24,7 +24,7 @@ right = 0.98   # the right side of the subplots of the figure
 bottom = 0.17  # the bottom of the subplots of the figure
 top = 0.98     # the top of the subplots of the figure
 
-model = 'FakeModel'
+model = 'ConceptualModel'
 
 if __name__ == '__main__':
     exps_ho = [loadpklz('../data/HooVer_%s_nqueries_regret_exp%d.pklz'%(model, exp_id)) for exp_id in range(1, 11)]
