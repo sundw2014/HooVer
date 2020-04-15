@@ -21,7 +21,7 @@ s = 5e-6
 theta_broken = 0.08
 r_max = 500
 
-k = 11
+k = 10
 
 class DetectingPedestrian(NiMC):
     def __init__(self):

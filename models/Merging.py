@@ -37,7 +37,7 @@ Theta = np.stack([state_start, state_start + state_range]).T
 unsafe_rule = 2
 lane0_end = lane0_initial_pos + 20
 
-k = 11
+k = 10
 
 def check_lane(car, lane):
     if len(lane) == 0:

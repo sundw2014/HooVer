@@ -25,7 +25,7 @@ top = 0.98     # the top of the subplots of the figure
 
 # -----------------------------------------------------------------------------
 
-model = 'Slplatoon3'
+model = 'Slplatoon'
 
 if __name__ == '__main__':
     budgets = np.logspace(np.log(0.85 * 1e5)/np.log(2), np.log(8e5)/np.log(2), num=6, base=2).astype('int')

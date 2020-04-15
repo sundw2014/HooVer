@@ -31,7 +31,7 @@ state_range = np.array([range_of_initial_set_per_car, ] * num_cars * num_lanes +
 Theta = np.stack([state_start, state_start + state_range]).T
 unsafe_rule = 2
 
-k = 10
+k = 9
 
 def check_lane(car, lane):
     if len(lane) == 0:

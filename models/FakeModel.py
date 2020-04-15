@@ -17,7 +17,7 @@ class FakeModel(NiMC):
         return np.random.choice([False, True], p=[1-prob, prob])
 
     def get_prob(self, state):
-        center = self.Theta.mean(dim=1)
+        center = self.Theta.mean(axis=1)
         r = np.sqrt(np.sum((state-center)**2))
         prob = min(1.0, np.exp(-1.0 * r ** 2 / self.s))
         return prob
