@@ -31,8 +31,6 @@ state_range = np.array([range_of_initial_set_per_car, ] * num_cars * num_lanes +
 Theta = np.stack([state_start, state_start + state_range]).T
 unsafe_rule = 2
 
-k = 9
-
 def check_lane(car, lane):
     if len(lane) == 0:
         return True
@@ -68,7 +66,7 @@ def lf2map(state): # linear format -> map
     return state_x + state_y
 
 class Mlplatoon(NiMC):
-    def __init__(self):
+    def __init__(self, k=9):
         super(Mlplatoon, self).__init__()
         self.set_Theta(Theta)
         self.set_k(k)

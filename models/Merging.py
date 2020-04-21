@@ -37,7 +37,6 @@ Theta = np.stack([state_start, state_start + state_range]).T
 unsafe_rule = 2
 lane0_end = lane0_initial_pos + 20
 
-k = 10
 
 def check_lane(car, lane):
     if len(lane) == 0:
@@ -54,7 +53,7 @@ def check_lane(car, lane):
     return (distance_rear > threshold_changing_lane_rear) and (distance_ahead > threshold_changing_lane_ahead)
 
 class Merging(NiMC):
-    def __init__(self):
+    def __init__(self, k=10):
         super(Merging, self).__init__()
         self.set_Theta(Theta)
         self.set_k(k)

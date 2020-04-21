@@ -6,11 +6,11 @@ from NiMC import NiMC
 __all__ = ['ConceptualModel']
 
 class ConceptualModel(NiMC):
-    def __init__(self, s):
+    def __init__(self, s, k=0):
         super(ConceptualModel, self).__init__()
         self.s = s
         self.set_Theta([[0,1],[0,1]])
-        self.set_k(0)
+        self.set_k(k)
 
     def is_unsafe(self, state):
         prob = self.get_prob(state)

@@ -28,10 +28,8 @@ state_start = np.array(list(range(num_cars)))[::-1] * initial_separation_between
 state_range = np.array([range_of_initial_set_per_car, ] * num_cars)
 Theta = np.stack([state_start, state_start + state_range]).T
 
-k = 11
-
 class Slplatoon(NiMC):
-    def __init__(self):
+    def __init__(self, k=11):
         super(Slplatoon, self).__init__()
         self.set_Theta(Theta)
         self.set_k(k)

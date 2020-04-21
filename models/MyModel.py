@@ -6,10 +6,10 @@ from NiMC import NiMC
 __all__ = ['MyModel']
 
 class MyModel(NiMC):
-    def __init__(self, sigma):
+    def __init__(self, sigma, k=10):
         super(MyModel, self).__init__()
         self.set_Theta([[1,2],[2,3]])
-        self.set_k(10)
+        self.set_k(k)
         self.sigma = sigma
 
     def is_unsafe(self, state):
