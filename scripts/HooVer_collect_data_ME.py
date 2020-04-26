@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     optimal_xs = [o['optimal_xs'][0] for o in outputs]
     original_results = [o['optimal_values'][0] for o in outputs]
-    num_queries = budgets
+    num_queries = [o['budget'][0] for o in outputs]
 
     # Monte-Carlo estimation of the hitting probability (using 250k simulations)
     nimc = models.__dict__[model]()

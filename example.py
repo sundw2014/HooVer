@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     num_exp = args.nRuns
 
-    budget_for_each_HOO = (args.budget - 40000) / args.nHOOs / args.batch_size
+    budget_for_each_HOO = (args.budget - 10000 * args.nHOOs) / args.nHOOs / args.batch_size # we use 10000 simulations for each instance of HOO to do MC estimation
 
     running_times = []
     memory_usages = []
@@ -49,6 +49,7 @@ if __name__ == '__main__':
     optimal_xs = []
     optimal_values = []
     num_nodes = []
+    n_queries = 0
 
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -80,7 +81,7 @@ if __name__ == '__main__':
         optimal_xs.append(optimal_x)
         depths.append(depth)
         num_nodes.append(n_nodes)
-
+        n_queries = nimc.cnt_queries
     print('budget: ' + str(args.budget))
     print('running time (s): %.2f +/- %.3f'%(np.mean(running_times), np.std(running_times)))
     print('memory usage (MB): %.2f +/- %.3f'%(np.mean(memory_usages), np.std(memory_usages)))
@@ -88,4 +89,5 @@ if __name__ == '__main__':
     print('optimal_xs: '+str(optimal_xs))
     print('depth: ' + str(depths))
     print('number of nodes: ' + str(num_nodes))
-    savepklz({'budget':args.budget, 'running_times':running_times, 'memory_usages':memory_usages, 'optimal_values':optimal_values, 'optimal_xs':optimal_xs, 'depths':depths, 'num_nodes':num_nodes}, args.filename)
+    print('actual n_queries: '+str(n_queries))
+    savepklz({'budget':n_queries, 'running_times':running_times, 'memory_usages':memory_usages, 'optimal_values':optimal_values, 'optimal_xs':optimal_xs, 'depths':depths, 'num_nodes':num_nodes}, args.filename)

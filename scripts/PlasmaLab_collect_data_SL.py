@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     results = []
     original_results = []
-    num_queries = budgets * 16.0
+    num_queries = []
 
     for budget in budgets:
         #delta = 2 / np.exp((budget*0.8)*2*(epsilon**2))
@@ -62,6 +62,7 @@ if __name__ == '__main__':
         # Strips the newline character
         output = [line.strip() for line in output]
         seeds = output[1:-6]
+        num_queries.append(len(seeds))
         final_iter = [int(line.split(' ')[3]) for line in seeds[-budget+10::]]
         final_iter = set(final_iter)
         original_results.append(float(output[-2].split('|')[2]))
