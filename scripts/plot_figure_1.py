@@ -46,7 +46,7 @@ for model in models:
 
     plt.errorbar(num_queries_pl.mean(axis=0), results_pl.mean(axis=0), results_pl.std(axis=0), capsize=5.0, fmt='-ok', label='PlasmaLab')
     plt.errorbar(num_queries_ho.mean(axis=0), results_ho.mean(axis=0), results_ho.std(axis=0), capsize=5.0, fmt='-or', label='HooVer')
-    plt.legend()
+    plt.legend(loc='lower right')
     plt.xlabel('#queries (x $10^5$)')
     plt.ylabel('hitting probability')
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top)
