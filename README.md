@@ -10,7 +10,7 @@ pip3 install -r requirements.txt
 
 ### Usage
 ```
-usage: example.py [-h] [--model MODEL] [--args ARGS [ARGS ...]]
+usage: check.py [-h] [--model MODEL] [--args ARGS [ARGS ...]]
                   [--nRuns NRUNS] [--budget BUDGET] [--rho_max RHO_MAX]
                   [--sigma SIGMA] [--nHOOs NHOOS] [--batch_size BATCH_SIZE]
                   [--output OUTPUT] [--seed SEED]
@@ -37,7 +37,7 @@ optional arguments:
 
 For example, to check the toy model, run the following command:
 ```
-python3 example.py --model MyModel --budget 100000
+python3 check.py --model MyModel --budget 100000
 ```
 You will find the following in the output, which is the most unsafe initial state:
 ```
@@ -47,7 +47,7 @@ optimal_xs: [array([1.97460938, 2.99414062])]
 ```
 
 ### Verify your own model
-The users can create their own model file, put it into the ```models/``` folder, and mofify ```models/__init__.py``` correspondingly. For example, one can create ```models/MyModel.py``` and run HooVer with ```python3 example.py --model MyModel --budget 100000```.
+The users can create their own model file, put it into the ```models/``` folder, and mofify ```models/__init__.py``` correspondingly. For example, one can create ```models/MyModel.py``` and run HooVer with ```python3 check.py --model MyModel --budget 100000```.
 
 In the model file, the user has to create a class which is a subclass of ```NiMC```. Here, we take ```models/MyModel.py``` as an example:
 ```python

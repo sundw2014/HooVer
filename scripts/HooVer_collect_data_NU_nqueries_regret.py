@@ -23,7 +23,7 @@ if __name__ == '__main__':
         s_results = []
         for budget in budgets:
             filename = 'data/HooVer_%s_nqueries_regret_budget%d_s%lf_exp%d.pklz'%(model, budget, s, exp_id)
-            os.system('cd ../; python example.py --nRuns 1 --sigma 1e-5 --model %s --args %lf --budget %d --filename %s --seed %d'%(model, s, budget, filename, exp_id*1024))
+            os.system('cd ../; python check.py --nRuns 1 --sigma 1e-5 --model %s --args %lf --budget %d --output %s --seed %d'%(model, s, budget, filename, exp_id*1024))
             nimc = models.__dict__[model](s=s)
             initial_states = loadpklz('../'+filename)['optimal_xs'][0]
             original_results.append(loadpklz('../'+filename)['optimal_values'][0])

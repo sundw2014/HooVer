@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # run an experiment for each batch_size configuration
     for bs in bss[::-1]:
         filename = 'data/HooVer_%s_budget%d_bs%d_exp%d.pklz'%(model, budget, bs, exp_id)
-        os.system('cd ../; python example.py --nRuns 1 --model %s --budget %d --batch_size %d --filename %s --seed %d'%(model, budget, bs, filename, exp_id*1024))
+        os.system('cd ../; python check.py --nRuns 1 --model %s --budget %d --batch_size %d --output %s --seed %d'%(model, budget, bs, filename, exp_id*1024))
         outputs.append(loadpklz('../'+filename))
 
     results = []
