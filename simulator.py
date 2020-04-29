@@ -18,22 +18,18 @@ model_names = sorted(name for name in models.__dict__
 parser = argparse.ArgumentParser(description='')
 
 parser.add_argument('--model', metavar='MODEL',
-                        default='Slplatoon3',
-                        # choices=model_names,
+                        default='Slplatoon',
                         help='models available: ' +
                             ' | '.join(model_names) +
-                            ' (default: Slplatoon3)')
-parser.add_argument('--args', nargs='+', type=float, help='<Optional>')
-parser.add_argument('--initial_states', nargs='+', type=float, help='<Optional>')
-parser.add_argument('--seed', type=int, default=1024, help='<Optional>')
-parser.add_argument('--port', type=int, help='', required=True)
+                            ' (default: Slplatoon)')
+parser.add_argument('--args', nargs='+', type=float, help='<Optional> This can be used to pass special arguments to the model.')
+parser.add_argument('--initial_states', nargs='+', type=float, help='<Optional> specify the initial_states directly.')
+parser.add_argument('--seed', type=int, default=1024, help='Random seed for reproducibility. (default: 1024)')
+parser.add_argument('--port', type=int, help='port to listen on', required=True)
 
 args = parser.parse_args()
 
 np.random.seed(args.seed)
-
-assert (args.initial_states is None or args.seed is None)
-
 
 if args.model == 'ConceptualModel':
     if args.args is None:
