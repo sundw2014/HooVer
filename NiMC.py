@@ -13,11 +13,11 @@ class NiMC(object):
 
     def transition(self):
         raise NotImplementedError('The new model file\
-         has to implement the transition() and is_unsafe() functions.')
+         has to implement the transition() function.')
 
     def is_unsafe(self):
         raise NotImplementedError('The new model file\
-         has to implement the transition() and is_unsafe() functions.')
+         has to implement the is_unsafe() function.')
 
     def set_Theta(self, Theta):
         Theta = np.array(Theta).astype('float') # [[l1,u1],[l2,u2],[l3,u3],...]
@@ -28,6 +28,11 @@ class NiMC(object):
 
 
     def simulate(self, initial_state, k=None):
+        if not (hasattr(self, 'Theta') and hasattr(self, 'k')):
+            raise NotImplementedError('The new model file\
+             has to specify Theta and k by calling set_Theta() and set_k()')
+
+        # increases by 1 every time the simulate function gets called
         self.cnt_queries += 1
 
         if k is None:
@@ -48,4 +53,3 @@ class NiMC(object):
 
     def __call__(self, initial_state, k=None):
         return self.simulate(initial_state, k)
-
