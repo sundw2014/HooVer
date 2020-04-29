@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--sigma', type=float, help='<Optional> Sigma parameter for UCB. If not specified, it will be sqrt(0.5*0.5/batch_size).')
     parser.add_argument('--nHOOs', type=int, default=4, help='Number of HOO instances to use. (default: 4)')
     parser.add_argument('--batch_size', type=int, default=100, help='Batch size. (default: 100)')
-    parser.add_argument('--filename', type=str, default='./output.pklz', help='Path to save the results. (default: ./output.pklz)')
+    parser.add_argument('--output', type=str, default='./output.pklz', help='Path to save the results. (default: ./output.pklz)')
     parser.add_argument('--seed', type=int, default=1024, help='Random seed for reproducibility. (default: 1024)')
     args = parser.parse_args()
 
@@ -97,4 +97,4 @@ if __name__ == '__main__':
     print('depth: ' + str(depths))
     print('number of nodes: ' + str(num_nodes))
     print('actual n_queries: '+str(n_queries))
-    savepklz({'budget':n_queries, 'running_times':running_times, 'memory_usages':memory_usages, 'optimal_values':optimal_values, 'optimal_xs':optimal_xs, 'depths':depths, 'num_nodes':num_nodes}, args.filename)
+    savepklz({'budget':n_queries, 'running_times':running_times, 'memory_usages':memory_usages, 'optimal_values':optimal_values, 'optimal_xs':optimal_xs, 'depths':depths, 'num_nodes':num_nodes}, args.output)
