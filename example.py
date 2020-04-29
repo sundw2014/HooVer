@@ -12,24 +12,21 @@ model_names = sorted(name for name in models.__dict__
     and callable(models.__dict__[name]))
 
 if __name__ == '__main__':
-    # true_max_probs = dict(zip(model_names, true_max_probs))
-
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--model', metavar='MODEL',
-                        default='Slplatoon3',
-                        # choices=model_names,
+                        default='Slplatoon',
                         help='models available: ' +
                             ' | '.join(model_names) +
-                            ' (default: Slplatoon3)')
-    parser.add_argument('--args', nargs='+', type=float, help='<Optional>')
-    parser.add_argument('--nRuns', type=int, default=1, help='number of runs')
-    parser.add_argument('--budget', type=int, default=int(1e6), help='budget for number of simulations')
-    parser.add_argument('--rho_max', type=float, default=0.6, help='time budget for simulator')
-    parser.add_argument('--sigma', type=float, help='Sigma parameter for UCB')
-    parser.add_argument('--nHOOs', type=int, default=4, help='number of HOO instances to use')
-    parser.add_argument('--batch_size', type=int, default=100, help='batch size')
-    parser.add_argument('--filename', type=str, default='./output.pklz', help='path to save the results')
-    parser.add_argument('--seed', type=int, default=1024, help='random seed for reproducibility')
+                            ' (default: Slplatoon)')
+    parser.add_argument('--args', nargs='+', type=float, help='<Optional> This can be used to pass special arguments to the model.')
+    parser.add_argument('--nRuns', type=int, default=1, help='Number of repetitions. (default: 1)')
+    parser.add_argument('--budget', type=int, default=int(1e6), help='Budget for total number of simulations. (default: 1e6)')
+    parser.add_argument('--rho_max', type=float, default=0.6, help='Smoothness parameter. (default: 0.6)')
+    parser.add_argument('--sigma', type=float, help='<Optional> Sigma parameter for UCB. If not specified, it will be sqrt(0.5*0.5/batch_size).')
+    parser.add_argument('--nHOOs', type=int, default=4, help='Number of HOO instances to use. (default: 4)')
+    parser.add_argument('--batch_size', type=int, default=100, help='Batch size. (default: 100)')
+    parser.add_argument('--filename', type=str, default='./output.pklz', help='Path to save the results. (default: ./output.pklz)')
+    parser.add_argument('--seed', type=int, default=1024, help='Random seed for reproducibility. (default: 1024)')
     args = parser.parse_args()
 
     if args.model == 'ConceptualModel':
@@ -41,7 +38,9 @@ if __name__ == '__main__':
 
     num_exp = args.nRuns
 
-    budget_for_each_HOO = (args.budget - 10000 * args.nHOOs) / args.nHOOs / args.batch_size # we use 10000 simulations for each instance of HOO to do MC estimation
+    # calculate budget for each HOO instance
+    # we use 10000 simulations for each instance of HOO to do MC estimation
+    budget_for_each_HOO = (args.budget - 10000 * args.nHOOs) / args.nHOOs / args.batch_size
 
     running_times = []
     memory_usages = []
@@ -51,13 +50,18 @@ if __name__ == '__main__':
     num_nodes = []
     n_queries = 0
 
+    # set random seed for reproducibility
     random.seed(args.seed)
     np.random.seed(args.seed)
+
     for _ in range(num_exp):
         start_time = time.time()
-        # import pdb; pdb.set_trace()
         nimc = model
 
+        # Calculate parameter sigma for UCB.
+        # sqrt(0.5*0.5/args.batch_size) is a valid parameter for any model.
+        # The user can also pass smaller sigma parameters to encourage the
+        # algorithm to explore deeper in the tree.
         if args.sigma is None:
             sigma = np.sqrt(0.5*0.5/args.batch_size)
         else:
@@ -66,6 +70,7 @@ if __name__ == '__main__':
         rho_max = args.rho_max
 
         try:
+            # call hoover.estimate_max_probability with the model and parameters
             optimal_x, optimal_value, depth, memory_usage, n_nodes =\
              hoover.estimate_max_probability(nimc, args.nHOOs, rho_max, sigma, budget_for_each_HOO, args.batch_size)
         except AttributeError as e:
@@ -81,6 +86,8 @@ if __name__ == '__main__':
         optimal_xs.append(optimal_x)
         depths.append(depth)
         num_nodes.append(n_nodes)
+        # Get the real number of queries from the model object.
+        # It may be a little bit different from the budget.
         n_queries = nimc.cnt_queries
     print('budget: ' + str(args.budget))
     print('running time (s): %.2f +/- %.3f'%(np.mean(running_times), np.std(running_times)))

@@ -3,7 +3,7 @@
 HooVer uses optimistic optimization to solve statistical model checking problems for MDPs.
 
 ### Requirements
-HooVer uses Python3. To install the requirements:
+HooVer uses Python 3. To install the requirements:
 ```
 pip3 install -r requirements.txt
 ```
