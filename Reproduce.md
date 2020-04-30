@@ -4,6 +4,7 @@ Please note that
 1. Reproducing all the experiments may take aoout two days since the implementation of the Java plugin for PlasmaLab is based on network communication and not very efficient.
 2. Results of PlasmaLab may not be reproduced exactly. Since PlasmaLab doesn't provide an interface to specify the random seed for reproducibility, curves for PlasmaLab in Fig.6 may not be reproduced exactly. However, for HooVer, we use fixed random seeds, and thus all the results of HooVer can be reproduced exactly.
 3. Running time of HooVer reported in Table 1 may not be reproduced, since it depends on the computational capability of the host machine.
+4. We have tested the VM and generated data and results in ```HooVer/data_old``` and ```HooVer/results_old```.
 
 ### Reproduce the results in VM
 You can run the following command in the VM to reproduce all the results:
@@ -11,7 +12,7 @@ You can run the following command in the VM to reproduce all the results:
 cd HooVer/scripts
 ./reproduce.sh
 ```
-This may take 2 days to finish due to slow communication between PlasmaLab and the external simulator. After finishing, the generated data will be located in ```HooVer/data```.  The following files will be generated in ```HooVer/scripts```:
+This may take 2 days to finish due to slow communication between PlasmaLab and the external simulator. After finishing, the generated data will be located in ```HooVer/data```.  The following files will be generated in ```HooVer/results```:
 ```
 Slplatoon3.pdf
 Mlplatoon.pdf
@@ -21,7 +22,7 @@ Table1.txt
 Table2.txt
 ConceptualModel_ss_result_nqueries.pdf
 ```
-If you want to see some results quickly, you can run the follow the following instructions to reproduce each result.
+If you want to see some results quickly, you can run the follow the following instructions to reproduce each result separately.
 #### Figure 6
 We evaluated HooVer on 4 benchmarks and the result is reported in Figure 6. For each benchmark:
 
@@ -53,12 +54,27 @@ cd HooVer/scripts
 ```
 The output figure will be located at ```HooVer/results/Merging.pdf```.
 
+#### Table 1
+```
+cd HooVer/scripts
+./reproduce_table1.sh
+```
+The output figure will be located at ```HooVer/results/Table1.txt```.
+
+#### Table 2
+```
+cd HooVer/scripts
+./reproduce_table2.sh
+```
+The output figure will be located at ```HooVer/results/Table2.txt```.
+
 #### Figure 7
 ```
 cd HooVer/scripts
 ./reproduce_figure7.sh
 ```
 The output figure will be located at ```HooVer/results/ConceptualModel_ss_result_nqueries.pdf```.
+
 
 ### If you want to reproduce the results in your own environment instead of using VM ...
 #### Install requirements
