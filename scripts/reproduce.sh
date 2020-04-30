@@ -1,3 +1,4 @@
+mkdir ../data
 pkill -f "simulator"
 
 parallel -u python3 -u HooVer_collect_data_ML.py ::: 1 2 3 4 5 6 7 8 9 10
