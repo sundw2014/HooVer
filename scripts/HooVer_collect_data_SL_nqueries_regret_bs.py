@@ -18,7 +18,7 @@ if __name__ == '__main__':
     for budget in budgets:
         for bs in bss[::-1]:
             filename = 'data/HooVer_%s_budget%d_nqueries_regret_bs%d_exp%d.pklz'%(model, budget, bs, exp_id)
-            os.system('cd ../; python check.py --nRuns 1 --model %s --budget %d --batch_size %d --output %s --seed %d'%(model, budget, bs, filename, exp_id*1024))
+            os.system('cd ../; python3 check.py --nRuns 1 --model %s --budget %d --batch_size %d --output %s --seed %d'%(model, budget, bs, filename, exp_id*1024))
             outputs.append(loadpklz('../'+filename))
 
     results = []

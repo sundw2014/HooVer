@@ -54,7 +54,7 @@ if __name__ == '__main__':
             print(epsilon, delta, budget, s)
             # The os.setsid() is passed in the argument preexec_fn so
             # it's run after the fork() and before  exec() to run the shell.
-            simulator = subprocess.Popen('cd ../; python simulator.py --model %s --args %lf --port %d'%(model, s, port), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
+            simulator = subprocess.Popen('cd ../; python3 simulator.py --model %s --args %lf --port %d'%(model, s, port), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
             output = subprocess.check_output(plasmalab_root+'/plasmacli.sh launch -m '+tmp_model_name+':PythonSimulatorBridge -r '+tmp_spec_name+':bltl -a smartsampling -A"Maximum"=True -A"Epsilon"=%lf -A"Delta"=%lf -A"Budget"=%d'%(epsilon, delta, budget), universal_newlines=True, shell=True)
             os.killpg(os.getpgid(simulator.pid), signal.SIGTERM)  # Send the signal to all the process groups
             with open('../data/PlasmaLab_%s_nqueries_regret_epsilon%lf_delta%lf_budget%d_s%lf_exp%d.txt'%(model, epsilon, delta, budget, s, exp_id), 'w') as f:

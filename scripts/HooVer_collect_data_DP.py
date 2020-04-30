@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # run an experiment for each budget configuration
     for budget in budgets:
         filename = 'data/HooVer_%s_budget%d_exp%d.pklz'%(model, budget, exp_id)
-        os.system('cd ../; python check.py --nRuns 1 --model %s --budget %d --output %s --seed %d'%(model, budget, filename, exp_id*1024))
+        os.system('cd ../; python3 check.py --nRuns 1 --model %s --budget %d --output %s --seed %d'%(model, budget, filename, exp_id*1024))
         outputs.append(loadpklz('../'+filename))
 
     results = []
