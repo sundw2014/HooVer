@@ -4,22 +4,25 @@ import numpy as np
 import subprocess
 from subprocess import DEVNULL, STDOUT, check_call
 import os, signal
-import importlib
 
 from utils.general_utils import loadpklz, savepklz, evaluate_single_state, temp_seed
-import MFMC
 
-model = 'FakeModel'
-T = 1
-dim = 2
+import models
+
+model = 'ConceptualModel'
+nimc = models.__dict__[model](0.1)
+
+T = nimc.k
+dim = nimc.Theta.shape[0]
 exp_id = int(sys.argv[1])
 port_base = 9100
 plasmalab_root = '/home/daweis2/plasmalab-1.4.4/'
 
-import models.FakeModel as FakeModel
 def get_initial_state(seed):
     with temp_seed(np.abs(seed) % (2**32)):
-        state = np.random.rand(len(FakeModel.state_start)) * FakeModel.state_range + FakeModel.state_start
+        state = np.random.rand(nimc.Theta.shape[0])\
+          * (nimc.Theta[:,1] - nimc.Theta[:,0])\
+          + nimc.Theta[:,0]
     state = state.tolist()
     return state
 
@@ -45,13 +48,13 @@ if __name__ == '__main__':
     for s, budgets in zip(ss, _budgets):
         s_results = []
         for budget in budgets:
-            FakeModel.s = s
+            nimc = models.__dict__[model](s=s)
             #delta = 2 / np.exp((budget*0.8)*2*(epsilon**2))
             epsilon = np.sqrt(np.log(2/delta)/np.log(np.e)/2/(budget*0.8))
             print(epsilon, delta, budget, s)
             # The os.setsid() is passed in the argument preexec_fn so
             # it's run after the fork() and before  exec() to run the shell.
-            simulator = subprocess.Popen('cd ../; python simulator.py --model %s_%lf --port %d'%(model, s, port), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
+            simulator = subprocess.Popen('cd ../; python3 simulator.py --model %s --args %lf --port %d'%(model, s, port), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
             output = subprocess.check_output(plasmalab_root+'/plasmacli.sh launch -m '+tmp_model_name+':PythonSimulatorBridge -r '+tmp_spec_name+':bltl -a smartsampling -A"Maximum"=True -A"Epsilon"=%lf -A"Delta"=%lf -A"Budget"=%d'%(epsilon, delta, budget), universal_newlines=True, shell=True)
             os.killpg(os.getpgid(simulator.pid), signal.SIGTERM)  # Send the signal to all the process groups
             with open('../data/PlasmaLab_%s_nqueries_regret_epsilon%lf_delta%lf_budget%d_s%lf_exp%d.txt'%(model, epsilon, delta, budget, s, exp_id), 'w') as f:
@@ -71,7 +74,7 @@ if __name__ == '__main__':
             tmp_results = []
             print(final_iter)
             for initial_states in final_iter:
-                tmp_results.append(FakeModel.get_prob(initial_states))
+                tmp_results.append(nimc.get_prob(initial_states))
             s_results.append(np.max(tmp_results))
         results.append(s_results)
 savepklz({'results':results, 'ss':ss, 'budgets':_budgets}, '../data/PlasmaLab_%s_nqueries_regret_exp%d.pklz'%(model, exp_id))

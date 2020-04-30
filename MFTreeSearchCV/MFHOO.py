@@ -604,10 +604,10 @@ class MFPOO(object):
             c1 = self.mfobject.eval_fidel_cost_single_point_normalised(z1)
             c2 = self.mfobject.eval_fidel_cost_single_point_normalised(z2)
 
-        if self.CAPITAL == 'Time':
-            self.unit_cost = unit_cost
-        else:
-            self.unit_cost = self.mfobject.eval_fidel_cost_single_point_normalised(1.0)
+        # if self.CAPITAL == 'Time':
+        #     self.unit_cost = unit_cost
+        # else:
+        #     self.unit_cost = self.mfobject.eval_fidel_cost_single_point_normalised(1.0)
         if self.debug:
             print('Number of MFHOO Instances: ' + str(self.nHOO))
             print('Budget per MFHOO Instance:' + str(self.budget))

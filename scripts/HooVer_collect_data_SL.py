@@ -1,16 +1,14 @@
-# Author: Dawei Sun
 import sys
 sys.path.append('..')
 import numpy as np
 import os
-import importlib
 
 from utils.general_utils import loadpklz, savepklz, evaluate_single_state
-import MFMC
+import models
 
 # -----------------------------------------------------------------------------
 
-model = 'Slplatoon3'
+model = 'Slplatoon'
 exp_id = int(sys.argv[1])
 
 if __name__ == '__main__':
@@ -20,23 +18,21 @@ if __name__ == '__main__':
     # run an experiment for each budget configuration
     for budget in budgets:
         filename = 'data/HooVer_%s_budget%d_exp%d.pklz'%(model, budget, exp_id)
-        os.system('cd ../; python example.py --nRuns 1 --model %s --budget %d --filename %s --seed %d'%(model, budget, filename, exp_id*1024))
+        os.system('cd ../; python3 check.py --nRuns 1 --model %s --budget %d --output %s --seed %d'%(model, budget, filename, exp_id*1024))
         outputs.append(loadpklz('../'+filename))
 
     results = []
 
     optimal_xs = [o['optimal_xs'][0] for o in outputs]
     original_results = [o['optimal_values'][0] for o in outputs]
-    num_queries = budgets
+    num_queries = [o['budget'] for o in outputs]
 
     # Monte-Carlo estimation of the hitting probability (using 250k simulations)
-    simulator = importlib.import_module('models.'+model)
-    MFMC.set_simulator(simulator)
-    _, mch = MFMC.get_mch_as_mf(batch_size = 1)
+    nimc = models.__dict__[model]()
     for initial_states in optimal_xs:
         initial_states = initial_states.tolist()
         np.random.seed(1024)
-        result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=250000)
+        result = evaluate_single_state(nimc, initial_states, nimc.k, mult=250000)
         results.append(result)
         print(result)
 

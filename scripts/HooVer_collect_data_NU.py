@@ -1,19 +1,15 @@
-# Author: Rajat Sen # Modified by Negin
 import sys
 sys.path.append('..')
 import numpy as np
-import subprocess
-from subprocess import DEVNULL, STDOUT, check_call
-import os, signal
+import os
 
-from utils.general_utils import loadpklz, savepklz
+from utils.general_utils import loadpklz, savepklz, evaluate_single_state
+import models
 
 # -----------------------------------------------------------------------------
 
-model = 'FakeModel'
+model = 'ConceptualModel'
 exp_id = int(sys.argv[1])
-
-import models.FakeModel as simulator
 
 if __name__ == '__main__':
     budget = 400000
@@ -23,11 +19,11 @@ if __name__ == '__main__':
     print(ss)
     for s in ss:
         filename = 'data/HooVer_%s_budget%d_s%lf_exp%d.pklz'%(model, budget, s, exp_id)
-        os.system('cd ../; python example.py --nRuns 1 --sigma 1e-5 --model %s_%lf --budget %d --filename %s --seed %d'%(model, s, budget, filename, exp_id*1024))
-        simulator.s = s
+        os.system('cd ../; python3 check.py --nRuns 1 --sigma 1e-5 --model %s --args %lf --budget %d --output %s --seed %d'%(model, s, budget, filename, exp_id*1024))
+        nimc = models.__dict__[model]()
         initial_states = loadpklz('../'+filename)['optimal_xs'][0]
         original_results.append(loadpklz('../'+filename)['optimal_values'][0])
-        result = simulator.get_prob(initial_states)
+        result = nimc.get_prob(initial_states)
         results.append(result)
 
     savepklz({'results':results, 'ss':ss, 'original_results':original_results}, '../data/HooVer_%s_exp%d.pklz'%(model, exp_id))

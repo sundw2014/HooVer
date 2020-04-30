@@ -23,7 +23,7 @@ right = 0.98   # the right side of the subplots of the figure
 bottom = 0.17  # the bottom of the subplots of the figure
 top = 0.98     # the top of the subplots of the figure
 
-models = ['Slplatoon3', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
+models = ['Slplatoon', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
 # models = ['Merging']
 
 models = [models[int(sys.argv[1])-1], ]
@@ -44,11 +44,11 @@ for model in models:
     results_ho = np.array(results_ho)
     num_queries_ho = np.array(num_queries_ho) / 1e5
 
-    plt.errorbar(num_queries_pl.mean(axis=0), results_pl.mean(axis=0), results_pl.std(axis=0), fmt='-ok', label='PlasmaLab')
-    plt.errorbar(num_queries_ho.mean(axis=0), results_ho.mean(axis=0), results_ho.std(axis=0), fmt='-or', label='HooVer')
-    plt.legend()
+    plt.errorbar(num_queries_pl.mean(axis=0), results_pl.mean(axis=0), results_pl.std(axis=0), capsize=5.0, fmt='-ok', label='PlasmaLab')
+    plt.errorbar(num_queries_ho.mean(axis=0), results_ho.mean(axis=0), results_ho.std(axis=0), capsize=5.0, fmt='-or', label='HooVer')
+    plt.legend(loc='lower right')
     plt.xlabel('#queries (x $10^5$)')
     plt.ylabel('hitting probability')
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top)
     #plt.show()
-    plt.savefig('%s.pdf'%model)
+    plt.savefig('../results/%s.pdf'%model)

@@ -1,4 +1,3 @@
-# Author: Rajat Sen # Modified by Negin
 import sys
 sys.path.append('..')
 import numpy as np
@@ -6,7 +5,7 @@ from utils.general_utils import loadpklz, savepklz
 
 # -----------------------------------------------------------------------------
 
-model = 'Slplatoon3'
+model = 'Slplatoon'
 
 if __name__ == '__main__':
     budget = 800000

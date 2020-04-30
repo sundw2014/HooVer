@@ -24,9 +24,10 @@ right = 0.98   # the right side of the subplots of the figure
 bottom = 0.17  # the bottom of the subplots of the figure
 top = 0.98     # the top of the subplots of the figure
 
-model = 'FakeModel'
+model = 'ConceptualModel'
 
 if __name__ == '__main__':
+    labels = ['s=0.1', 's=0.01', 's=0.001', 's=0.0003']
     exps_ho = [loadpklz('../data/HooVer_%s_nqueries_regret_exp%d.pklz'%(model, exp_id)) for exp_id in range(1, 11)]
     ss = exps_ho[0]['ss']
     budgets_ho = exps_ho[0]['budgets']
@@ -42,17 +43,19 @@ if __name__ == '__main__':
     smooth_func = lambda x: scipy.ndimage.filters.gaussian_filter1d(x, sigma=smooth_sigma)
 
     for ids, s in enumerate(ss):
-        result = smooth_func(1-results_ho[ids])
-        plt.plot(budgets_ho[ids]/1e5, result, '-', label='s=%.2fe-2'%(s*1e2), color=colors[ids])
+        #result = smooth_func(1-results_ho[ids])
+        result = smooth_func(results_ho[ids])
+        plt.plot(budgets_ho[ids]/1e5, result, '-', label=labels[ids], color=colors[ids])
         # plt.text(budgets_ho[ids][len(budgets_ho[ids])//2]/1e5, result[len(budgets_ho[ids])//2], 's=%.2fe-2'%(s*1e2))
 
-        result = smooth_func(1-results_pl[ids])
+        #result = smooth_func(1-results_pl[ids])
+        result = smooth_func(results_pl[ids])
         plt.plot(budgets_pl[ids]/1e5*16, result, '--', color=colors[ids])
         # plt.text(budgets_pl[ids][len(budgets_pl[ids])//2]/1e5*16, result[len(budgets_pl[ids])//2], 's=%.2fe-2'%(s*1e2))
 
 
     plt.xlabel('#queries (x $10^5$)')
-    plt.ylabel('regret')
+    plt.ylabel('hitting probability')
     plt.legend()
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top)
-    plt.savefig('%s_ss_result_nqueries.pdf'%model)
+    plt.savefig('../results/%s_ss_result_nqueries.pdf'%model)

@@ -8,107 +8,50 @@ import time
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
-simulator = None
-state_start = None
-state_range = None
-index_non_const_dims = None
-T = None
-
-def set_simulator(module):
-    global simulator, state_start, state_range, index_non_const_dims, T
-    simulator = module
-    state_start = simulator.state_start.astype('float')
-    state_range = simulator.state_range.astype('float')
-    index_non_const_dims = np.where(state_range>0)[0]
-    T = simulator.T
-
-def get_mch_as_mf(batch_size):
-    MCh = MarkovChain()
-    reward_function = lambda x, z: MCh.run_markov_chain(x, math.ceil(z))
-    fidel_cost_function = lambda z: 1
-    fidel_dim = 1
-    fidel_bounds = np.array([(1,T)] * fidel_dim)
-    return MFMarkovChain(reward_function, MCh.init_set_domain_bounds, MCh.init_set_domain_dim, fidel_cost_function,
-                         fidel_bounds, fidel_dim, batch_size), MCh
-# -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
-
-
-def get_mch():
-    return MarkovChain()
-
-# -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
-
-def get_full_state(_state):
-    _state = _state.reshape(-1)
-    state = state_start.copy()
-    if len(_state) == len(index_non_const_dims):
-        state[index_non_const_dims] = _state
-    elif len(_state) == len(state):
-        state[:] = _state
-    else:
-        raise ValueError('Wrong size')
-    return state
-
-class MarkovChain(object):
+class MFNiMC(object):
     """
-    Markov chain simulation class for n car platoon with policy.
-    """
-    def __init__(self):
-
-        """
-        time_hor = predefined time horizon for markov chain
-        unsafe_rule = rule for specifying unsafe set
-        """
-
-        self.init_set_domain_dim = len(index_non_const_dims)
-        bounds = np.stack([state_start[index_non_const_dims], state_start[index_non_const_dims] + state_range[index_non_const_dims]]).T
-        self.init_set_domain_bounds = bounds
-
-        self.cnt_queries = 0
-    # -----------------------------------------------------------------------------
-
-    def run_markov_chain(self, init_state, time_hor):
-
-        self.cnt_queries += 1
-
-        state = get_full_state(init_state).tolist()
-        state += [1, simulator.is_unsafe(state)]
-
-        unsafe = state[-1] > 0
-        reward = 0
-
-        for step in range(time_hor - 1):
-            if unsafe:
-                break
-            else:
-                state = simulator.step_forward(state)
-                unsafe = state[-1] > 0
-
-        if unsafe:
-            reward = 1
-
-        return reward
-
-
-class MFMarkovChain(object):
-    """
-        Markov chain simulation class for n-car platoon with policy.
+        This class is a wrapper for NiMC in order to use MFHOO.
+        This class normalizes the domain such that length of each dim after normalizing is 1.
     """
 
-    def __init__(self, reward_function, domain_bounds, domain_dim, fidel_cost_function, fidel_bounds, fidel_dim, batch_size):
+    def __init__(self, NiMC, batch_size):
+        self.NiMC = NiMC
+        self.Theta_index_non_const_dims = np.where(NiMC.Theta[:,1] - NiMC.Theta[:,0]>0)[0]
+
+        def reward_function(initial_state, fidel):
+            initial_state = self.get_full_state(initial_state).tolist()
+            reward = NiMC.simulate(initial_state, fidel)
+            return reward
 
         self.reward_function = reward_function
-        self.domain_bounds = domain_bounds
-        self.domain_dim = domain_dim
+
+        self.domain_bounds = NiMC.Theta[self.Theta_index_non_const_dims, :]
+        self.domain_dim = len(self.Theta_index_non_const_dims)
+
+        if hasattr(NiMC, 'fidel_cost_function'):
+            fidel_cost_function = NiMC.fidel_cost_function
+        else:
+            fidel_cost_function = lambda z: 1
+
         self.fidel_cost_function = fidel_cost_function
-        self.fidel_bounds = fidel_bounds
-        self.fidel_dim = fidel_dim
+        self.fidel_bounds = np.array([(1,NiMC.k)])
+        self.fidel_dim = 1
         self.opt_fidel_cost = self.cost_single(1)
         self.max_iteration = 200
         self.batch_size = batch_size
-        # self.opt_fidel_cost = self.cost_single_average(1)
+
+    # ---------------------------
+
+    def get_full_state(self, state):
+        _state = state.reshape(-1)
+        state = self.NiMC.Theta[:,0].copy()
+        if len(_state) == len(self.Theta_index_non_const_dims):
+            state[self.Theta_index_non_const_dims] = _state
+        elif len(_state) == len(state):
+            state[:] = _state
+        else:
+            raise ValueError('Wrong size')
+        return state
 
     # -----------------------------------------------------------------------------
 
@@ -197,6 +140,3 @@ class MFMarkovChain(object):
         return ret_Cell
 
     # -----------------------------------------------------------------------------
-
-    def mf_markov_chain(MCh_object):
-        return MFMarkovChain(MCh_object.reward_function, MCh_object.domain_bounds, MCh_object.domain_dim, MCh_object.fidel_cost_function, MCh_object.fidel_bounds, MCh_object.fidel_dim, MCh_object.batch_size)

@@ -4,23 +4,25 @@ import numpy as np
 import subprocess
 from subprocess import DEVNULL, STDOUT, check_call
 import os, signal
-import importlib
 
 from utils.general_utils import loadpklz, savepklz, evaluate_single_state, temp_seed
-import MFMC
 
-model = 'Slplatoon3'
-simulator = importlib.import_module('models.'+model)
+import models
 
-T = simulator.T
-dim = len(simulator.state_start)
+model = 'Slplatoon'
+nimc = models.__dict__[model]()
+
+T = nimc.k
+dim = nimc.Theta.shape[0]
 exp_id = int(sys.argv[1])
 port_base = 9100
 plasmalab_root = '/home/daweis2/plasmalab-1.4.4/'
 
 def get_initial_state(seed):
     with temp_seed(np.abs(seed) % (2**32)):
-        state = np.random.rand(len(simulator.state_start)) * simulator.state_range + simulator.state_start
+        state = np.random.rand(nimc.Theta.shape[0])\
+          * (nimc.Theta[:,1] - nimc.Theta[:,0])\
+          + nimc.Theta[:,0]
     state = state.tolist()
     return state
 
@@ -40,7 +42,7 @@ if __name__ == '__main__':
 
     results = []
     original_results = []
-    num_queries = budgets * 16.0
+    num_queries = []
 
     for budget in budgets:
         #delta = 2 / np.exp((budget*0.8)*2*(epsilon**2))
@@ -48,7 +50,7 @@ if __name__ == '__main__':
         print(epsilon, delta, budget)
         # The os.setsid() is passed in the argument preexec_fn so
         # it's run after the fork() and before  exec() to run the shell.
-        _simulator = subprocess.Popen('cd ../; python simulator.py --model %s --port %d'%(model, port), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
+        _simulator = subprocess.Popen('cd ../; python3 simulator.py --model %s --port %d'%(model, port), shell=True, preexec_fn=os.setsid, stdout=DEVNULL)
         output = subprocess.check_output(plasmalab_root+'/plasmacli.sh launch -m '+tmp_model_name+':PythonSimulatorBridge -r '+tmp_spec_name+':bltl -a smartsampling -A"Maximum"=True -A"Epsilon"=%lf -A"Delta"=%lf -A"Budget"=%d'%(epsilon, delta, budget), universal_newlines=True, shell=True)
         os.killpg(os.getpgid(_simulator.pid), signal.SIGTERM)  # Send the signal to all the process groups
         with open('../data/PlasmaLab_%s_epsilon%lf_delta%lf_budget%d_exp%d.txt'%(model, epsilon, delta, budget, exp_id), 'w') as f:
@@ -60,21 +62,20 @@ if __name__ == '__main__':
         # Strips the newline character
         output = [line.strip() for line in output]
         seeds = output[1:-6]
+        num_queries.append(len(seeds))
         final_iter = [int(line.split(' ')[3]) for line in seeds[-budget+10::]]
         final_iter = set(final_iter)
         original_results.append(float(output[-2].split('|')[2]))
         # print(original_results)
         final_iter = [get_initial_state(seed) for seed in final_iter]
         tmp_results = []
-        MFMC.set_simulator(simulator)
-        _, mch = MFMC.get_mch_as_mf(batch_size = 1)
         for initial_states in final_iter:
             np.random.seed(1024)
-            result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=10000)
+            result = evaluate_single_state(nimc, initial_states, nimc.k, mult=10000)
             tmp_results.append(result)
         initial_states = final_iter[np.argmax(tmp_results)]
         np.random.seed(1024)
-        result = evaluate_single_state(mch.run_markov_chain, initial_states, simulator.T, mult=250000)
+        result = evaluate_single_state(nimc, initial_states, nimc.k, mult=250000)
         print(result)
 
         results.append(result)
