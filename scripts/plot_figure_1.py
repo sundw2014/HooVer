@@ -51,4 +51,4 @@ for model in models:
     plt.ylabel('hitting probability')
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top)
     #plt.show()
-    plt.savefig('%s.pdf'%model)
+    plt.savefig('../results/%s.pdf'%model)

@@ -58,4 +58,4 @@ if __name__ == '__main__':
     plt.ylabel('hitting probability')
     plt.legend()
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top)
-    plt.savefig('%s_ss_result_nqueries.pdf'%model)
+    plt.savefig('../results/%s_ss_result_nqueries.pdf'%model)
