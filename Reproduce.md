@@ -2,7 +2,7 @@ We provide a VirtualBox VM image in which everything is setup for reproducing th
 
 Please note that
 1. Reproducing all the experiments may take aoout two days since the implementation of the Java plugin for PlasmaLab is based on network communication and not very efficient.
-2. Results of PlasmaLab may not be reproduced exactly. Since PlasmaLab doesn't provide an interface to specify the random seed for reproducibility, curves for PlasmaLab in Fig.3 may not be reproduced exactly. However, for HooVer, we use fixed random seeds, and thus all the results of HooVer can be reproduced exactly.
+2. Results of PlasmaLab may not be reproduced exactly. Since PlasmaLab doesn't provide an interface to specify the random seed for reproducibility, curves for PlasmaLab in Fig.6 may not be reproduced exactly. However, for HooVer, we use fixed random seeds, and thus all the results of HooVer can be reproduced exactly.
 3. Running time of HooVer reported in Table 1 may not be reproduced, since it depends on the computational capability of the host machine.
 
 ### Reproduce the results in VM
@@ -17,10 +17,48 @@ Slplatoon3.pdf
 Mlplatoon.pdf
 DetectingPedestrian.pdf
 Merging.pdf
-Conceptual
 Table1.txt
 Table2.txt
+ConceptualModel_ss_result_nqueries.pdf
 ```
+If you want to see some results quickly, you can run the follow the following instructions to reproduce each result.
+#### Figure 6
+We evaluated HooVer on 4 benchmarks and the result is reported in Figure 6. For each benchmark:
+
+##### SLplatoon
+```
+cd HooVer/scripts
+./reproduce_figure1_1.sh
+```
+The output figure will be located at ```HooVer/results/SLplatoon.pdf```.
+
+##### MLplatoon
+```
+cd HooVer/scripts
+./reproduce_figure1_2.sh
+```
+The output figure will be located at ```HooVer/results/MLplatoon.pdf```.
+
+##### DetectingPedestrian
+```
+cd HooVer/scripts
+./reproduce_figure1_3.sh
+```
+The output figure will be located at ```HooVer/results/DetectingPedestrian.pdf```.
+
+##### Merging
+```
+cd HooVer/scripts
+./reproduce_figure1_4.sh
+```
+The output figure will be located at ```HooVer/results/Merging.pdf```.
+
+#### Figure 7
+```
+cd HooVer/scripts
+./reproduce_figure7.sh
+```
+The output figure will be located at ```HooVer/results/ConceptualModel_ss_result_nqueries.pdf```.
 
 ### If you want to reproduce the results in your own environment instead of using VM ...
 #### Install requirements
