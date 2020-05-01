@@ -512,7 +512,7 @@ class MFHOO(object):
     def run(self):
         self.num_query = 0
         #import pdb; pdb.set_trace()
-        while self.t < self.budget:
+        while self.t+2 <= self.budget:
             # old_cost = self.cost
             # _t1 = time.time()
             self.num_query = self.num_query + 2
