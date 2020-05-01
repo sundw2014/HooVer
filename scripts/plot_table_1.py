@@ -10,7 +10,7 @@ model = 'Slplatoon'
 if __name__ == '__main__':
     budget = 800000
     outputs = []
-    bss = [10, 20, 50, 80, 100, 200, 400, 800]
+    bss = [10, 20, 50, 100, 400, 1600, 6400, 25600]
     for exp_id in range(1,10):
         outputs.append([])
         for bs in bss:
