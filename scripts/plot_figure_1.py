@@ -21,11 +21,11 @@ plt.rc('axes', axisbelow=True)
 left = 0.17  # the left side of the subplots of the figure
 right = 0.98   # the right side of the subplots of the figure
 bottom = 0.17  # the bottom of the subplots of the figure
-top = 0.98     # the top of the subplots of the figure
+top = 0.93     # the top of the subplots of the figure
 
 models = ['Slplatoon', 'Mlplatoon', 'DetectingPedestrian', 'Merging']
 # models = ['Merging']
-
+titles = ['$\mathsf{SLplatoon}(d=4, k=11)$','$\mathsf{MLplatoon}(d=9, k=9)$','$\mathsf{DetectBrake}(d=4 , k=10)$','$\mathsf{Merging}(d=4, k=10)$']
 models = [models[int(sys.argv[1])-1], ]
 
 for model in models:
@@ -49,6 +49,7 @@ for model in models:
     plt.legend(loc='lower right')
     plt.xlabel('#queries (x $10^5$)')
     plt.ylabel('hitting probability')
+    plt.title(titles[int(sys.argv[1])-1])
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top)
-    #plt.show()
+    # plt.show()
     plt.savefig('../results/%s.pdf'%model)

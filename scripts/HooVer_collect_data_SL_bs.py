@@ -14,7 +14,7 @@ exp_id = int(sys.argv[1])
 if __name__ == '__main__':
     budget = 800000
     outputs = []
-    bss = [10, 20, 50, 80, 100, 200, 400, 800]
+    bss = [10, 20, 50, 100, 400, 1600, 6400, 25600]
     # run an experiment for each batch_size configuration
     for bs in bss[::-1]:
         filename = 'data/HooVer_%s_budget%d_bs%d_exp%d.pklz'%(model, budget, bs, exp_id)
