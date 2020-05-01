@@ -13,7 +13,7 @@ exp_id = int(sys.argv[1])
 
 if __name__ == '__main__':
     ss = np.array([1e-1, 1e-2, 1e-3, 3e-4])
-    _budgets = [[0.408, 1.0], [0.408, 1.0], [0.5, 1.5], [1.0, 3.0]]
+    _budgets = [[0.412, 1.0], [0.412, 1.0], [0.5, 1.5], [1.0, 3.0]]
     _budgets = [np.logspace(np.log(start * 1e5)/np.log(2), np.log(end * 1e5)/np.log(2), num=20, base=2).astype('int') for start,end in _budgets]
 
     results = []
