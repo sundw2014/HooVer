@@ -1,4 +1,5 @@
 data*/
+results*/
 *.pdf
 *.pklz
 model_[0-9]*
