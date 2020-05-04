@@ -1,4 +1,4 @@
-We provide a VirtualBox VM image in which everything is setup for reproducing the results in the paper. You can download the VM [here](https://drive.google.com/open?id=1mozT8n4J88_SlEq0e8oTKyuYtm0S5lyv). We tested this image on a Linux workstation with two Xeon Silver 4110 CPUs and 32 GB RAM. You may have to change the configuration in VirtualBox to fit your host machine.
+We provide a VirtualBox VM image in which everything is setup for reproducing the results in the paper. You can download the VM [here](https://drive.google.com/file/d/1mozT8n4J88_SlEq0e8oTKyuYtm0S5lyv/view?usp=sharing). We tested this image on a Linux workstation with two Xeon Silver 4110 CPUs and 32 GB RAM. You may have to change the configuration in VirtualBox to fit your host machine.
 
 Please note that
 1. Reproducing all the experiments may take aoout two days since the implementation of the Java plugin for PlasmaLab is based on network communication and not very efficient.
@@ -85,7 +85,7 @@ sudo apt-get install parallel openjdk-11-jdk
 Other versions of JDK may also work, but we didn't test that. Then, you have to build the plugin for PlasmaLab.
 
 ##### Prepare PlasmaLab and the plugin
-First, [download PlasmaLab](http://plasma-lab.gforge.inria.fr/download_counter.php?Download=plasma_lab_bundle/plasmalab/fr.inria.plasmalab-1.4.4-distribution.zip) and extract it. Then, [download the source code](https://drive.google.com/file/d/1WkVKMwGa6OEw947s3ttTgZV0T0CHbCAS/view?usp=sharing) of the plugin and extract it.
+First, [download PlasmaLab](http://plasma-lab.gforge.inria.fr/download_counter.php?Download=plasma_lab_bundle/plasmalab/fr.inria.plasmalab-1.4.4-distribution.zip) and extract it. Then, [download the source code](https://drive.google.com/file/d/15g8Q085TfsKJNKhtAjZA_KMGT_qehAIw/view?usp=sharing) of the plugin and extract it.
 
 Now, you can start to build the plugin. First, open the build script ```PlasmaLab-plugin/PythonSimulatorBridge/build.sh```, find the following line and change it to your own plasmalab dir:
 ```
