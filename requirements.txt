@@ -4,3 +4,4 @@ llist
 zmq
 msgpack
 matplotlib
+scipy
