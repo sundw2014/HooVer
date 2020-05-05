@@ -1,4 +1,4 @@
-We provide a VirtualBox VM image in which everything is setup for reproducing the results in the paper. You can download the VM [here](https://drive.google.com/file/d/1mozT8n4J88_SlEq0e8oTKyuYtm0S5lyv/view?usp=sharing)(username & passwd: hoover). We tested this image on a Linux workstation with two Xeon Silver 4110 CPUs and 32 GB RAM. You may have to change the configuration in VirtualBox to fit your host machine.
+We provide a VirtualBox VM image in which everything is setup for reproducing the results in the paper. You can download the VM [here](https://drive.google.com/file/d/1imfQ6DHJIUv6pU_iQhElioupYLq52JyV/view?usp=sharing)(username & passwd: hoover). We tested this image on a Linux workstation with two Xeon Silver 4110 CPUs and 32 GB RAM. You may have to change the configuration in VirtualBox to fit your host machine.
 
 Please note that
 1. Reproducing all the experiments may take about two days since the implementation of the Java plugin for PlasmaLab is based on network communication and not very efficient.
