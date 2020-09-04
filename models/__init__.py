@@ -3,5 +3,6 @@ from .ConceptualModel import *
 from .Merging import *
 from .MyModel import *
 from .Slplatoon import *
+from .Slplatoon_brake import *
 from .Mlplatoon import *
 from .Mlplatoon_18cars import *
