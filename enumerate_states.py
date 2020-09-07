@@ -23,7 +23,7 @@ model_names = sorted(name for name in models.__dict__
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--model', metavar='MODEL',
-                        default='Slplatoon',
+                        default='Slplatoon_brake',
                         help='models available: ' +
                             ' | '.join(model_names) +
                             ' (default: Slplatoon)')
@@ -49,7 +49,7 @@ def evaluate_single_state(X, mult=args.mult):
     value = value / mult
     return value
 
-initial_states = np.meshgrid(np.arange(20,20.1,1), np.arange(10,10.1,1), np.arange(0,0.1,1), np.arange(0.5,1.5,0.01), np.arange(0.5,1.5,0.01))#, range(40,45+1))
+initial_states = np.meshgrid(np.arange(20,20.1,1), np.arange(10,10.1,1), np.arange(0,0.1,1), np.arange(0.5,1.5,0.05), np.arange(0.5,1.5,0.05))#, range(40,45+1))
 initial_states = list(np.stack([x.reshape(-1) for x in initial_states], axis=1))
 
 # x = [x[1] for x in initial_states]
@@ -58,6 +58,7 @@ initial_states = list(np.stack([x.reshape(-1) for x in initial_states], axis=1))
 # from IPython import embed; embed()
 with Pool(processes=32) as pool:
     prob = list(tqdm.tqdm(pool.imap(partial(evaluate_single_state), initial_states), total=len(initial_states)))
+# prob = list(tqdm.tqdm(map(partial(evaluate_single_state), initial_states), total=len(initial_states)))
 
 from IPython import embed; embed()
 # for prob, T in zip(probs, time_horizons):
@@ -66,8 +67,8 @@ from IPython import embed; embed()
 # plt.show()
 # from utils.general_utils import savepklz
 # savepklz({'prob':prob, 'initial_states':initial_states}, '/tmp/Slplatoon3_n4_local.pklz')
-# from mpl_toolkits.mplot3d import Axes3D
-# import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 # import numpy as np
 # from utils.general_utils import savepklz, loadpklz
 #
@@ -78,9 +79,14 @@ from IPython import embed; embed()
 # dis1 = initial_states[:,0] - initial_states[:,1]
 # dis2 = initial_states[:,1] - initial_states[:,2]
 #
-# fig = plt.figure()
-# ax = fig.gca(projection='3d')
+fig = plt.figure()
+ax = fig.gca(projection='3d')
 #
-# ax.plot_trisurf(dis1, dis2, prob, linewidth=0.2, antialiased=True)
+x = np.array([x[-2] for x in initial_states]).reshape(20,20)
+y = np.array([x[-1] for x in initial_states]).reshape(20,20)
+prob = np.array(prob).reshape(20,20)
+
+# ax.plot_trisurf(x, y, prob, linewidth=0.2, antialiased=True)
+ax.plot_wireframe(x, y, prob)
 #
-# plt.show()
+plt.show()

@@ -24,13 +24,13 @@ unsafe_rule_close = 1
 num_cars = 3
 initial_separation_between_cars = 10
 range_of_initial_set_per_car = 0
-state_start = np.concatenate(np.array(list(range(num_cars)))[::-1] * initial_separation_between_cars, np.array([0.5, 0.5]))
+state_start = np.concatenate([np.array(list(range(num_cars)))[::-1] * initial_separation_between_cars, np.array([0.5, 0.5])])
 state_range = np.array([range_of_initial_set_per_car, ] * num_cars + [1., 1.])
 Theta = np.stack([state_start, state_start + state_range]).T
 
-class Slplatoon(NiMC):
+class Slplatoon_brake(NiMC):
     def __init__(self, k=11):
-        super(Slplatoon, self).__init__()
+        super(Slplatoon_brake, self).__init__()
         self.set_Theta(Theta)
         self.set_k(k)
 
@@ -66,5 +66,6 @@ class Slplatoon(NiMC):
                 v = np.random.choice(velocities, p = p)
                 position = car.value + v + ita
                 state_current.append(position)
-        state = list(state_current)+state[-2:]
+        # import pdb; pdb.set_trace()
+        state = list(state_current) + list(state)[-2:]
         return state
