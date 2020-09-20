@@ -127,9 +127,19 @@ class PID_Cartpole(NiMC):
         self.set_Theta([[-2.0, -0.5], [-3., -1.], [-3., -1.]])
         self.set_k(k)
 
+    def simulate(self, initial_state, k=None):
+        # increases by 1 every time the simulate function gets called
+        self.cnt_queries += 1
+
+        if k is None:
+            k = self.k
+
+        state = initial_state
+        return simulate(state[0], state[1], state[2])
+
     def is_unsafe(self, state):
         # put every thing here
-        return simulate(state[0], state[1], state[2])
+        raise NotImplementedError('is_unsafe')
 
     def transition(self, state):
         assert len(state) == self.Theta.shape[0]
