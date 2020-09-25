@@ -25,6 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--sigma', type=float, help='<Optional> Sigma parameter for UCB. If not specified, it will be sqrt(0.5*0.5/batch_size).')
     parser.add_argument('--nHOOs', type=int, default=4, help='Number of HOO instances to use. (default: 4)')
     parser.add_argument('--batch_size', type=int, default=100, help='Batch size. (default: 100)')
+    parser.add_argument('--final_eval_mult', type=int, default=10000, help='Batch size. (default: 100)')
     parser.add_argument('--output', type=str, default='./output.pklz', help='Path to save the results. (default: ./output.pklz)')
     parser.add_argument('--seed', type=int, default=1024, help='Random seed for reproducibility. (default: 1024)')
     args = parser.parse_args()
@@ -40,7 +41,7 @@ if __name__ == '__main__':
 
     # calculate budget for each HOO instance
     # we use 10000 simulations for each instance of HOO to do MC estimation
-    budget_for_each_HOO = (args.budget - 10000 * args.nHOOs) / args.nHOOs / args.batch_size
+    budget_for_each_HOO = (args.budget - args.final_eval_mult * args.nHOOs) / args.nHOOs / args.batch_size
 
     running_times = []
     memory_usages = []
@@ -72,7 +73,7 @@ if __name__ == '__main__':
         try:
             # call hoover.estimate_max_probability with the model and parameters
             optimal_x, optimal_value, depth, memory_usage, n_nodes =\
-             hoover.estimate_max_probability(nimc, args.nHOOs, rho_max, sigma, budget_for_each_HOO, args.batch_size)
+             hoover.estimate_max_probability(nimc, args.nHOOs, rho_max, sigma, budget_for_each_HOO, args.batch_size, final_eval_mult=args.final_eval_mult)
         except AttributeError as e:
             print(e)
             continue
