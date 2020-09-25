@@ -8,7 +8,6 @@ import numpy as np
 import sys
 sys.path.append('..')
 from NiMC import NiMC
-from simple_pid import PID
 import math, time, sys
 
 __all__ = ['PID_Cartpole']

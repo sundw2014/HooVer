@@ -8,3 +8,4 @@ from .Mlplatoon import *
 from .Mlplatoon_18cars import *
 from .PID_Cartpole import *
 from .LinearOutputFeedback import *
+from .LQR import *
