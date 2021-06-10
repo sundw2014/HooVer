@@ -74,6 +74,8 @@ class LQR(NiMC):
             cost += x.T.dot(self.Q).dot(x) * self.dt
             if i is not self.N-1:
                 cost += u.T.dot(self.R).dot(u) * self.dt
+            if (np.isfinite(x).sum() != self.n) or (cost > 100.):
+                break
             # print(x.T.dot(self.Q).dot(x) * self.dt, u.T.dot(self.R).dot(u) * self.dt)
         return 1. - min(cost * 0.1, 1.)
 

@@ -34,6 +34,10 @@ if __name__ == '__main__':
         if args.args is None:
             raise ValueError('Please specify the s parameter using --args')
         model = models.__dict__[args.model](s = args.args[0])
+    elif args.model == 'LQR':
+        if args.args is None:
+            raise ValueError('Please specify the s parameter using --args')
+        model = models.__dict__[args.model](sigma = args.args[0])
     else:
         model = models.__dict__[args.model]()
 
